@@ -1,0 +1,15 @@
+Resources:
+  CustomersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: customerId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: customerId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.TableReadCap}
+        WriteCapacityUnits: ${self:custom.TableWriteCap}
+      TableName: ${self:custom.tableNames.customers}

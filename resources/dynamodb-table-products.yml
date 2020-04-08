@@ -1,0 +1,15 @@
+Resources:
+  ProductsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: productId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.TableReadCap}
+        WriteCapacityUnits: ${self:custom.TableWriteCap}
+      TableName: ${self:custom.tableNames.products}

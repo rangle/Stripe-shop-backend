@@ -1,0 +1,37 @@
+{
+  "name": "stripe-connect-aws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "serverless deploy",
+    "local": "serverless offline start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.2",
+    "request": "^2.88.2",
+    "stripe": "^8.31.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.36",
+    "@types/jsonwebtoken": "^8.3.8",
+    "@types/node": "^12.12.29",
+    "@types/request": "^2.48.3",
+    "@types/stripe": "^7.13.22",
+    "@types/uuid": "^3.4.8",
+    "aws-sdk": "^2.639.0",
+    "express": "^4.17.1",
+    "serverless-domain-manager": "^3.3.1",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-http": "^2.3.2",
+    "serverless-offline": "^5.12.1",
+    "serverless-plugin-typescript": "^1.1.9",
+    "typescript": "^3.8.3"
+  }
+}

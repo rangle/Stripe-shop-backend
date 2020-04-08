@@ -1,0 +1,326 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: stripe-react-frontend
+# app and org for use with dashboard.serverless.com
+app: stripe-connect-aws
+org: keneasson
+
+custom:
+  customDomain:
+    domainName: api${self:provider.stage}.kene.info
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+  serverless-offline:
+    port: 15001
+  endpoints:
+    dynamodb-url: 'http://localhost:8000'
+#  vpc-config:
+#    dev: "vpc-disabled"
+#    test: "vpc-netsvcs"
+#    staging: "vpc-forward"
+#    production: "vpc-netsvcs"
+#  api-productId: # Circular dependency workaround, first deploy API, then get API ID, add here and redeploy
+#    dev: "ja8me2enof"
+#    test: "xtoi0iwn5g"
+#    staging: "9ts5i2sbpg"
+#    production: "xf01d3gj2h"
+#  warmup:
+#    enabled: false
+#    vpc: false
+#    timeout: 20
+#    prewarm: true
+  tableNames:
+    cartItems: ${self:service}-${opt:stage, self:provider.stage}-cartItems01
+    customers: ${self:service}-${opt:stage, self:provider.stage}-customers01
+    orders: ${self:service}-${opt:stage, self:provider.stage}-orders01
+    products: ${self:service}-${opt:stage, self:provider.stage}-catalog01
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: false
+    stages:
+      - dev
+  CartItemsTableName: ${self:custom.tableNames.cartItems}
+  CustomersTableName: ${self:custom.tableNames.customers}
+  OrdersTableName: ${self:custom.tableNames.orders}
+  ProductsTableName: ${self:custom.tableNames.products}
+  TableWriteCap: 2
+  TableReadCap: 2
+#  alerts:
+#    stages:
+#      - test
+#      - staging
+#      - production
+#    dashboards: true
+#    topics:
+#      alarm:
+#        topic: ${self:service}-${opt:stage, self:provider.stage}-alerts-alarm
+#        notifications:
+#          - protocol: email
+#            endpoint: ken.easson@rangle.io
+#    alarms:
+#      - functionErrors
+#      - functionThrottles
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+# you can overwrite defaults here
+  stage: dev
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE_CUSTOMERS: ${self:custom.tableNames.customers}
+    DYNAMODB_TABLE_PRODUCTS: ${self:custom.tableNames.products}
+    DYNAMODB_TABLE_ORDERS: ${self:custom.tableNames.products}
+    DYNAMODB_TABLE_CARTITEMS: ${self:custom.tableNames.cartItems}
+    CONFIG_DYNAMODB_ENDPOINT: ${self:custom.endpoints.dynamodb-url}
+    STRIPE_API_KEY: 'sk_test_81qW27tAnNAkRSA2ZpAaaOtj003gCBIn1l'
+    STRIPE_API_VERSION: '2020-03-02'
+#    COGNITO_USER_POOL:
+#      'Fn::GetAtt': [ userPool, Arn ]
+# you can add statements to the Lambda function's IAM Role here
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - Fn::GetAtt: [ProductsTable, Arn]
+        - Fn::Join:
+          - '/'
+          - - Fn::GetAtt: [ ProductsTable, Arn ]
+            - "index/*"
+        - Fn::GetAtt: [OrdersTable, Arn]
+        - Fn::Join:
+          - '/'
+          - - Fn::GetAtt: [ OrdersTable, Arn ]
+            - "index/*"
+        - Fn::GetAtt: [CustomersTable, Arn]
+        - Fn::Join:
+            - '/'
+            - - Fn::GetAtt: [ CustomersTable, Arn ]
+              - "index/*"
+        - Fn::GetAtt: [CartItemsTable, Arn]
+        - Fn::Join:
+            - '/'
+            - - Fn::GetAtt: [ CartItemsTable, Arn ]
+              - "index/*"
+functions:
+  # Payment Intents
+  createPaymentIntent:
+    handler: src/handler.createPaymentIntent
+    events:
+      - http:
+          path: paymentIntent/create
+          method: post
+          cors: true
+  getPaymentIntents:
+    handler: src/handler.getPaymentIntents
+    events:
+      - http:
+          path: paymentIntent/list
+          method: get
+          cors: true
+  cancelPaymentIntent:
+    handler: src/handler.cancelPaymentIntent
+    events:
+      - http:
+          path: paymentIntent/cancel
+          method: put
+          cors: true
+  startPayment:
+    handler: src/handler.startPayment
+    events:
+      - http:
+          path: paymentIntent/startPayment
+          method: post
+          cors: true
+  # Catalog
+  addProduct:
+    handler: src/handler.addProduct
+    events:
+      - http:
+          path: catalog/addProduct
+          method: post
+          cors: true
+  importProducts:
+    handler: src/handler.importProducts
+    events:
+      - http:
+          path: catalog/importProducts
+          method: post
+          cors: true
+  # Customer
+  addCustomer:
+    handler: src/handler.addCustomer
+    events:
+      - http:
+          path: customer/addCustomer
+          method: post
+          cors: true
+  importCustomers:
+    handler: src/handler.importCustomers
+    events:
+      - http:
+          path: customer/importCustomers
+          method: post
+          cors: true
+  getCustomer:
+    handler: src/handler.getCustomer
+    events:
+      - http:
+          path: customer/getCustomer
+          method: post
+          cors: true
+  getCustomers:
+    handler: src/handler.getCustomers
+    events:
+      - http:
+          path: customer/getCustomers
+          method: get
+          cors: true
+  getProducts:
+    handler: src/handler.getProducts
+    events:
+      - http:
+          path: catalog/getProducts
+          method: get
+          cors: true
+  # Cart Items
+  addCartItem:
+    handler: src/handler.addCartItem
+    events:
+      - http:
+          path: cart/addItem
+          method: post
+          cors: true
+  getCarts:
+    handler: src/handler.getCarts
+    events:
+      - http:
+          path: cart/getCarts
+          method: post
+          cors: true
+  # Orders
+  addOrder:
+    handler: src/handler.addOrder
+    events:
+      - http:
+          path: orders/addOrder
+          method: post
+          cors: true
+  getOrder:
+    handler: src/handler.getOrder
+    events:
+      - http:
+          path: orders/getOrder
+          method: get
+          cors: true
+  #Terminal -- capturePaymentIntent
+  createTerminalConnection:
+    handler: src/handler.createTerminalConnection
+    events:
+      - http:
+          path: terminal/connect
+          method: get
+          cors: true
+
+  capturePaymentIntent:
+    handler: src/handler.capturePaymentIntent
+    events:
+      - http:
+          path: terminal/capture
+          method: post
+          cors: true
+
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - websocket: $connect
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+
+resources:
+  - ${file(resources/dynamodb-table-products.yml)}
+  - ${file(resources/dynamodb-table-orders.yml)}
+  - ${file(resources/dynamodb-table-cartItems.yml)}
+  - ${file(resources/dynamodb-table-customer.yml)}
+          #  Resources:
+          #      userPool:
+          #        Type: AWS::Cognito::UserPool
+          #        Properties:
+          #          AdminCreateUserConfig:
+          #            AllowAdminCreateUserOnly: true
+          #AliasAttributes:
+          #  - String
+          #AutoVerifiedAttributes:
+          #  - String
+          #DeviceConfiguration:
+          #  DeviceConfiguration
+          #EmailConfiguration:
+          #  EmailConfiguration
+          #EmailVerificationMessage: String
+          #EmailVerificationSubject: String
+          #LambdaConfig:
+          #  LambdaConfig
+          #MfaConfiguration: String
+          #Policies:
+          # Cognito UI - app client ID: 2egmh16mjherp1rj54l5cdchp3
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-dynamodb-local
+  - serverless-offline # should be last in the list
+  - serverless-domain-manager
+

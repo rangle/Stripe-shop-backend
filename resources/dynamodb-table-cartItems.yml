@@ -1,0 +1,38 @@
+Resources:
+  CartItemsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: cartItemId
+          AttributeType: S
+        - AttributeName: customerId
+          AttributeType: S
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: cartItemId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: customerId
+          KeySchema:
+            - AttributeName: customerId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: productId
+          KeySchema:
+            - AttributeName: productId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.TableReadCap}
+        WriteCapacityUnits: ${self:custom.TableWriteCap}
+      TableName: ${self:custom.tableNames.cartItems}

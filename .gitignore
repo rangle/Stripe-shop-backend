@@ -1,0 +1,17 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+admin.env
+.env
+_meta
+.serverless
+.dynamodb
+.build
+
+#IDE
+.DS_Store
+**/.idea
+.vscode
+
