@@ -82,7 +82,7 @@ Populate your Catalog with Items. As DynamoDb is dynamic - there's a lot of lati
 * **Ken Easson** - *Initial work* - [Rangle.io](https://rangle.io)
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 * Dave McDonald - *Overall project support*
