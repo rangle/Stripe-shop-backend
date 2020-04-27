@@ -44,6 +44,7 @@ custom:
   tableNames:
     cartItems: ${self:service}-${opt:stage, self:provider.stage}-cartItems01
     customers: ${self:service}-${opt:stage, self:provider.stage}-customers01
+    businesses: ${self:service}-${opt:stage, self:provider.stage}-businesses01
     orders: ${self:service}-${opt:stage, self:provider.stage}-orders01
     products: ${self:service}-${opt:stage, self:provider.stage}-catalog01
   dynamodb:
@@ -56,6 +57,7 @@ custom:
       - dev
   CartItemsTableName: ${self:custom.tableNames.cartItems}
   CustomersTableName: ${self:custom.tableNames.customers}
+  BusinessesTableName: ${self:custom.tableNames.businesses}
   OrdersTableName: ${self:custom.tableNames.orders}
   ProductsTableName: ${self:custom.tableNames.products}
   TableWriteCap: 2
@@ -85,6 +87,7 @@ provider:
   region: us-east-1
   environment:
     DYNAMODB_TABLE_CUSTOMERS: ${self:custom.tableNames.customers}
+    DYNAMODB_TABLE_BUSINESSES: ${self:custom.tableNames.businesses}
     DYNAMODB_TABLE_PRODUCTS: ${self:custom.tableNames.products}
     DYNAMODB_TABLE_ORDERS: ${self:custom.tableNames.products}
     DYNAMODB_TABLE_CARTITEMS: ${self:custom.tableNames.cartItems}
@@ -114,6 +117,11 @@ provider:
           - '/'
           - - Fn::GetAtt: [ OrdersTable, Arn ]
             - "index/*"
+        - Fn::GetAtt: [BusinessesTable, Arn]
+        - Fn::Join:
+            - '/'
+            - - Fn::GetAtt: [ BusinessesTable, Arn ]
+              - "index/*"
         - Fn::GetAtt: [CustomersTable, Arn]
         - Fn::Join:
             - '/'
@@ -154,7 +162,15 @@ functions:
           path: paymentIntent/startPayment
           method: post
           cors: true
-  # Catalog
+  # Catalog Products
+  getProducts:
+    handler: src/handler.getProducts
+    events:
+      - http:
+          path: catalog/getProducts
+          method: get
+          cors: true
+
   addProduct:
     handler: src/handler.addProduct
     events:
@@ -198,11 +214,33 @@ functions:
           path: customer/getCustomers
           method: get
           cors: true
-  getProducts:
-    handler: src/handler.getProducts
+  # Business
+  addBusiness:
+    handler: src/handler.addBusiness
     events:
       - http:
-          path: catalog/getProducts
+          path: business/addBusiness
+          method: post
+          cors: true
+  importBusinesss:
+    handler: src/handler.importBusinesses
+    events:
+      - http:
+          path: business/importBusinesses
+          method: post
+          cors: true
+  getBusiness:
+    handler: src/handler.getBusiness
+    events:
+      - http:
+          path: business/getBusiness
+          method: post
+          cors: true
+  getBusinesses:
+    handler: src/handler.getBusinesses
+    events:
+      - http:
+          path: business/getBusinesses
           method: get
           cors: true
   # Cart Items
@@ -296,6 +334,7 @@ resources:
   - ${file(resources/dynamodb-table-orders.yml)}
   - ${file(resources/dynamodb-table-cartItems.yml)}
   - ${file(resources/dynamodb-table-customer.yml)}
+  - ${file(resources/dynamodb-table-business.yml)}
           #  Resources:
           #      userPool:
           #        Type: AWS::Cognito::UserPool

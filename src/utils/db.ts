@@ -9,3 +9,16 @@ export const dynamoDb = (isOffline)
         endpoint: dynamoDB_endpoint,
     })
     : new AWS.DynamoDB.DocumentClient();
+
+export const upsert = (params: any) => {
+    return new Promise((resolve, reject) => {
+        dynamoDb.put(params, (error, result) => {
+            if (error) {
+                reject({error} );
+            } else {
+                resolve({result});
+            }
+        });
+    });
+
+};

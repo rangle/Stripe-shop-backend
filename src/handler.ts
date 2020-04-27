@@ -21,3 +21,8 @@ export * from './api/customer/addCustomer';
 export * from './api/customer/getCustomer';
 export * from './api/customer/getCustomers';
 export * from './api/customer/importCustomers';
+
+export * from './api/business/addBusiness';
+export * from './api/business/getBusiness';
+export * from './api/business/getBusinesses';
+export * from './api/business/importBusinesses';

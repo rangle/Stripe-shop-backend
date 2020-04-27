@@ -7,8 +7,8 @@ export const createCustomer = async (stripe, customer: CustomerInput) => {
         email: customer.email,
         phone: String(customer.phone),
         address: {
-           line1: customer.address?.address1,
-           line2: customer.address?.address2,
+           line1: customer.address?.line1,
+           line2: customer.address?.line2,
            city: customer.address?.city,
            state: customer.address?.province,
            postal_code: customer.address?.postalCode,
@@ -16,9 +16,13 @@ export const createCustomer = async (stripe, customer: CustomerInput) => {
         },
     };
 
-    // Create a Customer:
-    const stripeCustomer: Stripe.Customer = await stripe.customers.create(params);
-
-    return stripeCustomer;
-
+    // Create the Customer:
+    try {
+        const stripeCustomer: Stripe.Customer = await stripe.customers.create(params);
+        return stripeCustomer;
+    }
+    catch (error) {
+        console.log('Unable to save customer to Stripe Platform');
+        throw(error);
+    };
 };

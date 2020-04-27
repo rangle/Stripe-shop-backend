@@ -1,0 +1,15 @@
+Resources:
+  BusinessTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: businessId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: businessId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: ${self:custom.TableReadCap}
+        WriteCapacityUnits: ${self:custom.TableWriteCap}
+      TableName: ${self:custom.tableNames.businesses}

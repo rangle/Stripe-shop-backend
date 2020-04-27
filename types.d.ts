@@ -82,8 +82,8 @@ type PaymentIntent = PaymentCommon & {
 //
 
 type Address = {
-    address1: string,
-    address2?: string,
+    line1: string,
+    line2?: string,
     city: string,
     province?: string,
     country: string,
@@ -93,7 +93,7 @@ type Address = {
 type CustomerInput = {
     name?: string,
     email?: string,
-    phone?: number,
+    phone?: string,
     address?: Address,
     StripeCustomerId?: string
 };
@@ -113,6 +113,33 @@ type validCustomer = {
 type CustomerTable = {
     TableName: string,
     Item?: Customer,
+};
+
+type BusinessInput = {
+    businessName: string,
+    contactName?: string,
+    email: string,
+    phone?: string,
+    address: Address,
+    info?: string,
+    website?: string,
+};
+
+type Business = BusinessInput | {
+    businessId: string,
+    createdAt: number,
+    updatedAt: number,
+}
+
+type validBusiness = {
+    isValid: boolean,
+    errors?: DbError,
+    params?: Business,
+};
+
+type BusinessTable = {
+    TableName: string,
+    Item?: Business,
 };
 
 type PostCartItem = {

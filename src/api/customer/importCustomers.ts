@@ -1,6 +1,5 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import { dynamoDb } from "../../utils/db";
-import { Customer, CustomerTable } from "../../../types";
 import { successHandler} from "../../utils/apiResponse";
 
 type ImportCustomers = {
@@ -23,7 +22,6 @@ export const importCustomers: Handler = (event: APIGatewayEvent | ScheduledEvent
     for(let i = 0; i< data.Count; i++) {
 
         params.Item = data.Items[i];
-
 
         dynamoDb.put(params, (error, result) => {
             if (error) {
