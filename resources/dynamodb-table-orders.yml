@@ -1,7 +1,7 @@
 Resources:
   OrdersTable:
     Type: AWS::DynamoDB::Table
-    DeletionPolicy: Delete
+    DeletionPolicy: Retain
     Properties:
       AttributeDefinitions:
         - AttributeName: orderId

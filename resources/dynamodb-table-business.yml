@@ -1,5 +1,5 @@
 Resources:
-  BusinessTable:
+  BusinessesTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:

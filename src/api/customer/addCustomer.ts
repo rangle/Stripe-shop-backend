@@ -1,26 +1,28 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import { Stripe } from 'stripe';
 import {upsert} from "../../utils/db";
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {validateCustomer} from "../../utils/CustomerValidations";
 import {createCustomer} from "../../services/stripe/createCustomer";
+import {updateCustomer} from "../../services/stripe/updateCustomer";
+
+type saveCustomer = {
+    isSaveCustomer: boolean;
+}
 
 export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
-    const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
-        typescript: true,
-    });
 
-    const data: CustomerInput =  JSON.parse((event as APIGatewayEvent).body);
+    const data: CustomerInput & saveCustomer =  JSON.parse((event as APIGatewayEvent).body);
     const validCustomer: validCustomer = validateCustomer(data);
 
     if (! validCustomer.isValid) {
         return errorHandler(callBack, 'ERROR: Customer contains invalid data.', validCustomer.error );
     }
 
+
     try {
-        const stripeCustomer: Stripe.Customer = await createCustomer(stripe, validCustomer.params);
-        validCustomer.params.StripeCustomerId = stripeCustomer.id;
+
+        const stripeCustomer = data.isSaveCustomer && await upsertToStripe(validCustomer);
+        validCustomer.params.StripeCustomerId = (data.isSaveCustomer) ? stripeCustomer.id : '';
 
         const params: CustomerTable = {
             TableName: process.env.DYNAMODB_TABLE_CUSTOMERS,
@@ -45,3 +47,12 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
         );
     }
 };
+
+async function upsertToStripe(validCustomer) {
+        const stripeCustomer = (validCustomer.params.StripeCustomerId)
+            ? await updateCustomer(validCustomer.params)
+            : await createCustomer(validCustomer.params);
+
+    return stripeCustomer;
+}
+

@@ -11,16 +11,16 @@
 #
 # Happy Coding!
 
-service: stripe-react-frontend
+service: stripe-shop-backend
 # app and org for use with dashboard.serverless.com
 app: stripe-connect-aws
 org: keneasson
 
 custom:
   customDomain:
-    domainName: api${self:provider.stage}.kene.info
-    basePath: ''
-    stage: ${self:provider.stage}
+    domainName: api${opt:stage, self:provider.stage}.kene.info
+    basePath: 'v1'
+    stage: ${opt:stage, self:provider.stage}
     createRoute53Record: true
   serverless-offline:
     port: 15001
@@ -32,10 +32,10 @@ custom:
 #    staging: "vpc-forward"
 #    production: "vpc-netsvcs"
 #  api-productId: # Circular dependency workaround, first deploy API, then get API ID, add here and redeploy
-#    dev: "ja8me2enof"
-#    test: "xtoi0iwn5g"
-#    staging: "9ts5i2sbpg"
-#    production: "xf01d3gj2h"
+#    dev: ""
+#    test: ""
+#    staging: ""
+#    production: ""
 #  warmup:
 #    enabled: false
 #    vpc: false
@@ -360,6 +360,6 @@ resources:
 plugins:
   - serverless-plugin-typescript
   - serverless-dynamodb-local
-  - serverless-offline # should be last in the list
   - serverless-domain-manager
+  - serverless-offline # should be last in the list
 

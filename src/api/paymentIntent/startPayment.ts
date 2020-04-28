@@ -53,7 +53,7 @@ export const startPayment: Handler = async (event: APIGatewayEvent | ScheduledEv
 
         if (saveCustomer) {
             if(billing_details) {
-                const stripeCustomer = await createCustomer(stripe, billing_details);
+                const stripeCustomer = await createCustomer(billing_details);
                 results.params.customer = stripeCustomer.id;
             }
         }

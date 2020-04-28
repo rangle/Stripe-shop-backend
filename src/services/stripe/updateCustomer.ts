@@ -1,12 +1,15 @@
 import { Stripe } from 'stripe';
 
-export const createCustomer = async (customer: CustomerInput): Promise<Stripe.Customer> => {
+export const updateCustomer = async (customer: CustomerInput): Promise<Stripe.Customer> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
         apiVersion: process.env.STRIPE_API_VERSION,
         typescript: true,
     });
 
-    const params: Stripe.CustomerCreateParams = {
+    if (! customer.StripeCustomerId) {
+        throw('Unable to update a customer without an existing Stripe CustomerID');
+    }
+    const params: Stripe.CustomerUpdateParams = {
         name: customer.name,
         email: customer.email,
         phone: String(customer.phone),
@@ -22,7 +25,7 @@ export const createCustomer = async (customer: CustomerInput): Promise<Stripe.Cu
 
     // Create the Customer:
     try {
-        const stripeCustomer: Stripe.Customer = await stripe.customers.create(params);
+        const stripeCustomer: Stripe.Customer = await stripe.customers.update(customer.StripeCustomerId, params);
         return stripeCustomer;
     }
     catch (error) {

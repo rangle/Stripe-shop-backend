@@ -12,10 +12,13 @@ install the AWS cli tools and serverless tools.
 
 update the serverless.yml file to suite your needs, the current serverless.yml is configured to use a real domain name through CloudFront, it's beyond the scope of this readme.  
 https://serverless.com/framework/docs/providers/aws/events/cloudfront/  
+
+create your API Gateway Endpoint (Domain name)
+https://www.serverless.com/blog/serverless-api-gateway-domain/
  
 ```yaml
 # app and org for use with dashboard.serverless.com
-app: stripe-connect-aws
+app: example_app #CHANGE THIS to the name of the App you created in Serverless
 org: example_org #CHANGE THIS
 
 custom:
