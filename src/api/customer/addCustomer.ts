@@ -6,22 +6,22 @@ import {createCustomer} from "../../services/stripe/createCustomer";
 import {updateCustomer} from "../../services/stripe/updateCustomer";
 
 type saveCustomer = {
-    isSaveCustomer: boolean;
+    isSaveCustomer: number;
 }
 
 export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
 
     const data: CustomerInput & saveCustomer =  JSON.parse((event as APIGatewayEvent).body);
+    console.log('incomming data', data);
     const validCustomer: validCustomer = validateCustomer(data);
 
     if (! validCustomer.isValid) {
         return errorHandler(callBack, 'ERROR: Customer contains invalid data.', validCustomer.error );
     }
 
-
     try {
 
-        const stripeCustomer = data.isSaveCustomer && await upsertToStripe(validCustomer);
+        const stripeCustomer = (data.isSaveCustomer === 1) && await upsertToStripe(validCustomer);
         validCustomer.params.StripeCustomerId = (data.isSaveCustomer) ? stripeCustomer.id : '';
 
         const params: CustomerTable = {
