@@ -6,6 +6,8 @@ export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Cu
         typescript: true,
     });
 
+    console.log('In here, customerUpdate');
+
     if (! customer.StripeCustomerId) {
         throw('Unable to update a customer without an existing Stripe CustomerID');
     }
