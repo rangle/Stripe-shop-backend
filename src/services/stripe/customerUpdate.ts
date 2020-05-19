@@ -1,6 +1,6 @@
 import { Stripe } from 'stripe';
 
-export const updateCustomer = async (customer: CustomerInput): Promise<Stripe.Customer> => {
+export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Customer> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
         apiVersion: process.env.STRIPE_API_VERSION,
         typescript: true,

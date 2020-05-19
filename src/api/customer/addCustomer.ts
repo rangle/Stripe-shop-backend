@@ -2,8 +2,8 @@ import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws
 import {upsert} from "../../utils/db";
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {validateCustomer} from "../../utils/CustomerValidations";
-import {createCustomer} from "../../services/stripe/createCustomer";
-import {updateCustomer} from "../../services/stripe/updateCustomer";
+import {customerCreate} from "../../services/stripe/customerCreate";
+import {customerUpdate} from "../../services/stripe/customerUpdate";
 
 type saveCustomer = {
     isSaveCustomer: number;
@@ -50,8 +50,8 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
 
 async function upsertToStripe(validCustomer) {
         const stripeCustomer = (validCustomer.params.StripeCustomerId)
-            ? await updateCustomer(validCustomer.params)
-            : await createCustomer(validCustomer.params);
+            ? await customerUpdate(validCustomer.params)
+            : await customerCreate(validCustomer.params);
 
     return stripeCustomer;
 }
