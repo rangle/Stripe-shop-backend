@@ -5,7 +5,7 @@ export const customerCreate = async (customer: CustomerInput): Promise<Stripe.Cu
         apiVersion: process.env.STRIPE_API_VERSION,
         typescript: true,
     });
-
+    console.log('In here customerCreate');
     const params: Stripe.CustomerCreateParams = {
         name: customer.name,
         email: customer.email,
@@ -22,11 +22,12 @@ export const customerCreate = async (customer: CustomerInput): Promise<Stripe.Cu
 
     // Create the Customer:
     try {
+        console.log('params', params);
         const stripeCustomer: Stripe.Customer = await stripe.customers.create(params);
         return stripeCustomer;
     }
     catch (error) {
-        console.log('Unable to save customer to Stripe Platform');
+        console.log('Unable to save customer to Stripe Platform', params);
         throw(error);
     };
 };

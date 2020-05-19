@@ -20,9 +20,11 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
     }
 
     try {
-
+        console.log('stripeCustomer', validCustomer);
         const stripeCustomer = (data.isSaveCustomer === 1) && await upsertToStripe(validCustomer);
-        validCustomer.params.StripeCustomerId = (data.isSaveCustomer) ? stripeCustomer.id : '';
+        if (data.isSaveCustomer === 1 && stripeCustomer.id) {
+            validCustomer.params.StripeCustomerId = stripeCustomer.id;
+        }
 
         const params: CustomerTable = {
             TableName: process.env.DYNAMODB_TABLE_CUSTOMERS,
@@ -49,6 +51,7 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
 };
 
 async function upsertToStripe(validCustomer) {
+    console.log('HERE upsertToStripe', validCustomer);
         const stripeCustomer = (validCustomer.params.StripeCustomerId)
             ? await customerUpdate(validCustomer.params)
             : await customerCreate(validCustomer.params);

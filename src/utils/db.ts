@@ -12,13 +12,15 @@ export const dynamoDb = (isOffline)
 
 export const upsert = (params: any) => {
     return new Promise((resolve, reject) => {
+        console.log('upsert to dynamodb', params);
         dynamoDb.put(params, (error, result) => {
             if (error) {
+                error.source = 'DynamoDB Exception';
+                console.log('DB Error: upsert failed with ', error);
                 reject({error} );
             } else {
                 resolve({result});
             }
         });
     });
-
 };
