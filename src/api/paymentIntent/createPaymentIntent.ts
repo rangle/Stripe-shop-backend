@@ -1,13 +1,9 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import { Stripe } from 'stripe';
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {validatePaymentIntent} from "../../utils/PaymentIntentValidation";
+import {paymentIntentCreate} from "../../services/stripe/paymentIntentCreate";
 
 export const createPaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
-    const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
-        typescript: true,
-    });
     const requestData: any = JSON.parse((event as APIGatewayEvent).body);
 
     const results = validatePaymentIntent(requestData);
@@ -20,7 +16,7 @@ export const createPaymentIntent: Handler = async (event: APIGatewayEvent | Sche
     }
 
     try {
-        const paymentIntent = await stripe.paymentIntents.create(results.params);
+        const paymentIntent = await paymentIntentCreate(results.params);
         return successHandler(
             callBack,
             {
