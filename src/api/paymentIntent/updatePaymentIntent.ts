@@ -1,7 +1,12 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import { Stripe } from 'stripe';
+import {errorHandler, successHandler} from "../../utils/apiResponse";
 
-export const createPaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+/**
+ * Utility that should never be used in a Production environment.
+ * Use startPayment to create or update the payment intent based on the Customer's Cart.
+ */
+export const updatePaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
     // @ts-ignore
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
         apiVersion: process.env.STRIPE_API_VERSION,
@@ -14,50 +19,21 @@ export const createPaymentIntent: Handler = async (event: APIGatewayEvent | Sche
         amount,
         currency,
         payment_method_types,
-        capture_method,
-        off_session,
     } = requestData;
 
     const valid_payment_method_types = (payment_method_types) ? payment_method_types : ['card'];
-    const valid_capture_method = (capture_method == 'manual') ? capture_method : 'automatic';
-    // const valid_setup_future_usage = (off_session) ? 'off_session' : 'on_session';
     try {
-        const paymentIntent = await stripe.paymentIntents.create({
+        const paymentIntent = await stripe.paymentIntents.update(requestData.Id,{
             amount,
             currency,
             payment_method_types: valid_payment_method_types,
-            capture_method: valid_capture_method,
-            // setup_future_usage: valid_setup_future_usage,
         });
-        return callBack(null, {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({
+        return successHandler(callBack, {
                     message: 'Payment Intent Created!',
                     PaymentIntent: paymentIntent,
-                },
-                null,
-                2,
-            ),
-        });
+                });
     }
     catch(error) {
-        callBack(null,{
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({
-                    message: 'ERROR Payment Intent Creation FAILED!',
-                    errorDetails: error,
-                },
-                null,
-                2,
-            ),
-        });
+        errorHandler(callBack,'Error: createPaymentIntent failed with an exception!', error);
     }
 }

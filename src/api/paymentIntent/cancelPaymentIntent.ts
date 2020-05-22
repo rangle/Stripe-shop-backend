@@ -1,5 +1,6 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import { Stripe} from 'stripe';
+import {errorHandler, successHandler} from "../../utils/apiResponse";
 
 export const cancelPaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
@@ -21,35 +22,12 @@ export const cancelPaymentIntent: Handler = async (event: APIGatewayEvent | Sche
             cancellation_reason: reason
         });
 
-        return callBack(null, {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({
-                    message: 'Payment cancelled!',
-                    PaymentIntent: paymentIntent,
-                },
-                null,
-                2,
-            ),
+        return successHandler(callBack, {
+            message: 'Payment cancelled!',
+            PaymentIntent: paymentIntent,
         });
     }
     catch(error) {
-        return callBack(null, {
-            statusCode: 500,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify({
-                    message: 'ERROR Payment Intent Cancellation FAILED!',
-                    errorDetails: error,
-                },
-                null,
-                2,
-            ),
-        });
+        return errorHandler(callBack,'Error: cancelPaymentIntent FAILED with exception!', error);
     }
 }

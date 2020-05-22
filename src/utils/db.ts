@@ -12,7 +12,6 @@ export const dynamoDb = (isOffline)
 
 export const upsert = (params: any) => {
     return new Promise((resolve, reject) => {
-        console.log('upsert to dynamodb', params);
         dynamoDb.put(params, (error, result) => {
             if (error) {
                 error.source = 'DynamoDB Exception';
@@ -23,4 +22,26 @@ export const upsert = (params: any) => {
             }
         });
     });
+};
+
+export const batchUpsert = async (data: any[], table: string): Promise<any[]> => {
+    const params: any = {
+        TableName: table,
+    };
+    return await putBatchData(data, params);
+}
+
+const putBatchData = async (data: any[], params: any): Promise<any[]> => {
+    const log = [];
+    await data.reduce(async (acc, item) => {
+        params.Item = item;
+        try {
+            await upsert(params);
+            log.push({success: item.name});
+
+        } catch (error) {
+            log.push({failed: item.name});
+        };
+    }, []);
+    return log;
 };
