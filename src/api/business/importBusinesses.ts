@@ -24,7 +24,6 @@ export const importBusinesses: Handler = async (event: APIGatewayEvent | Schedul
 
             const params: BusinessTable = {
                 TableName: process.env.DYNAMODB_TABLE_BUSINESSES,
-
                 Item: validBusiness.params,
             };
             const result = upsert(params);

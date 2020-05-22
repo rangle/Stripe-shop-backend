@@ -1,11 +1,13 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import {errorHandler, successHandler} from "../../utils/apiResponse";
-import {getCustomerItems, getItemProductAmounts} from "../../services/getCustomerCartItems";
-import {customerCreate} from "../../services/stripe/createCustomer";
+import {getCustomerItems, getItemProductAmounts} from "../../services/getCustomerCartUtils";
+import {customerCreate} from "../../services/stripe/customerCreate";
 import {validatePaymentIntent} from "../../utils/PaymentIntentValidation";
 import {paymentIntentCreate} from "../../services/stripe/paymentIntentCreate";
 
 export const startPayment: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+    // Payment Method Types should be setup from Constants on the BACK END.
+    // This isn't something a production env get's from the front end.
     const {
         customerId,
         payment_method_types,
@@ -45,7 +47,9 @@ export const startPayment: Handler = async (event: APIGatewayEvent | ScheduledEv
             );
         };
 
+        // TODO should be checking if a customer is already created, and if so doing an update Customer.
         if (saveCustomer) {
+            // NOTE: A Customer can be created with an empty object, and details added later.
             if(billing_details) {
                 const stripeCustomer = await customerCreate(billing_details);
                 results.params.customer = stripeCustomer.id;

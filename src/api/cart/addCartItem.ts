@@ -1,8 +1,8 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import { dynamoDb } from "../../utils/db";
+import { upsert } from "../../utils/db";
 import { errorHandler, successHandler } from "../../utils/apiResponse";
 
-export const addCartItem: Handler = (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+export const addCartItem: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
 
     const uuid = require('uuid');
 
@@ -21,13 +21,14 @@ export const addCartItem: Handler = (event: APIGatewayEvent | ScheduledEvent, co
         },
     };
 
-    dynamoDb.put(params, (error, result) => {
-        if (error) {
-            return errorHandler(callBack, 'ERROR: Couldn\'t add the Cart Item.', error );
-        }
+    try {
+        await upsert(params);
         return successHandler(callBack, {
             cartItemId: params.Item.cartItemId,
             customerId: params.Item.customerId,
         });
-    });
+    }
+    catch(error) {
+        return errorHandler(callBack, 'ERROR: Couldn\'t add the Cart Item.', error );
+    }
 }
