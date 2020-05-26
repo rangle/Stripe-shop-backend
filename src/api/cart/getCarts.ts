@@ -1,6 +1,6 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import { errorHandler, successHandler } from "../../utils/apiResponse";
-import {getCustomerItems} from "../../services/getCustomerCartUtils";
+import {getCustomerItems} from "../../services/db/getCustomerCartUtils";
 
 export const getCarts: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
 

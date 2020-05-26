@@ -5,7 +5,8 @@ export const customerCreate = async (customer: CustomerInput): Promise<Stripe.Cu
         apiVersion: process.env.STRIPE_API_VERSION,
         typescript: true,
     });
-    console.log('In here customerCreate');
+
+    // @todo this should have Validation!!
     const params: Stripe.CustomerCreateParams = {
         name: customer.name,
         email: customer.email,

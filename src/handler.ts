@@ -4,6 +4,8 @@ export * from './api/paymentIntent/getPaymentIntents';
 
 export * from './api/paymentIntent/startPayment';
 
+export * from './api/subscriptions/startSubscription';
+
 export * from './api/catalog/addProduct';
 export * from './api/catalog/getProducts';
 export * from './api/catalog/importProducts';

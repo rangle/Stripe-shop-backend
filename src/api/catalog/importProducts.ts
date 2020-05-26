@@ -10,6 +10,9 @@ type Product = {
     currency: 'cad' | 'usd',
     createdAt: number,
     updatedAt: number,
+    stripeProductId?: string,
+    stripePriceId?: string,
+    interval?: Interval
 };
 
 type ProductTable = {

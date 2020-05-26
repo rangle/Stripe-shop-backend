@@ -8,19 +8,62 @@ type DbError = {
 };
 
 type Currency = 'cad' | 'usd';
+type Interval = 'day' | 'week' | 'month' | 'year';
+type UsageType = 'licensed' | 'metered';
 
 type Product = {
     productId: string,
     name: string,
     description: string,
     amount: number,
+    hasSubscription?: boolean,
     currency: Currency,
     createdAt: number,
     updatedAt: number,
+    stripeProductId?: string,
+    stripePriceId?: string,
+    interval?: string,
 };
 
 type Products = Product[];
 
+type StripeProductInput = {
+    name: string,
+    description: string,
+}
+
+type StripeProduct = StripeProductInput & {
+    id: string,
+}
+
+type StripePriceInput = {
+    product: string,
+    unit_amount: number,
+    currency: string,
+    interval: Interval,
+    usage_type?: UsageType,
+}
+
+type StripePrice = {
+    id?: string,
+    product: string,
+    unit_amount: number,
+    currency: string,
+    recurring: {
+        interval: Interval,
+        usage_type?: UsageType,
+    },
+}
+
+type StripeSubscriptionItems = {
+    price: string,
+    quantity: number,
+}
+
+type StripeSubscription = {
+    customer: string,
+    items: StripeSubscriptionItems[],
+}
 
 type ProductTable = {
     TableName: string,
@@ -171,6 +214,14 @@ type OrderItem = {
 };
 
 type OrderItems = OrderItem[];
+
+type SubscriptionItem = {
+    productId: string,
+    stripePriceId: string,
+    quantity?: number,
+}
+
+type SubscriptionItems = SubscriptionItem[];
 
 type Validation = {
     errors?: DbError,

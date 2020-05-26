@@ -162,6 +162,14 @@ functions:
           path: paymentIntent/startPayment
           method: post
           cors: true
+  # Subscriptions
+  startSubscription:
+    handler: src/handler.startSubscription
+    events:
+      - http:
+          path: subscription/startSubscription
+          method: post
+          cors: true
   # Catalog Products
   getProducts:
     handler: src/handler.getProducts

@@ -1,9 +1,8 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import {upsert} from "../../utils/db";
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {validateCustomer} from "../../utils/CustomerValidations";
-import {customerCreate} from "../../services/stripe/customerCreate";
-import {customerUpdate} from "../../services/stripe/customerUpdate";
+import {upsertToStripe} from "../../services/stripe/customerUpsert";
+import {customerWrite} from "../../services/db/customerWrite";
 
 type saveCustomer = {
     isSaveCustomer: number;
@@ -21,24 +20,20 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
 
     try {
         console.log('stripeCustomer', validCustomer);
-        const stripeCustomer = (data.isSaveCustomer === 1) && await upsertToStripe(validCustomer);
-        if (data.isSaveCustomer === 1 && stripeCustomer.id) {
+        if(data.isSaveCustomer === 1) {
+            const stripeCustomer = await upsertToStripe(validCustomer.params);
             validCustomer.params.StripeCustomerId = stripeCustomer.id;
+            console.log('stripeCustomer', stripeCustomer);
         }
 
-        const params: CustomerTable = {
-            TableName: process.env.DYNAMODB_TABLE_CUSTOMERS,
-            Item: validCustomer.params,
-        };
-        const savedData = await upsert(params);
-        console.log('savedData', savedData);
+        const savedCustomer = customerWrite(validCustomer.params);
+        console.log('savedData', savedCustomer);
 
         return successHandler(
             callBack,
             {
                 message: 'Stripe Customer Created!',
-                id: params.Item.customerId,
-                stripeCustomer: stripeCustomer,
+                stripeCustomer: savedCustomer,
             });
     }
     catch(error) {
@@ -49,13 +44,3 @@ export const addCustomer: Handler = async (event: APIGatewayEvent | ScheduledEve
         );
     }
 };
-
-async function upsertToStripe(validCustomer) {
-    console.log('HERE upsertToStripe', validCustomer);
-        const stripeCustomer = (validCustomer.params.StripeCustomerId)
-            ? await customerUpdate(validCustomer.params)
-            : await customerCreate(validCustomer.params);
-
-    return stripeCustomer;
-}
-

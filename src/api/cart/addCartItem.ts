@@ -24,8 +24,7 @@ export const addCartItem: Handler = async (event: APIGatewayEvent | ScheduledEve
     try {
         await upsert(params);
         return successHandler(callBack, {
-            cartItemId: params.Item.cartItemId,
-            customerId: params.Item.customerId,
+            newItem: params.Item,
         });
     }
     catch(error) {
