@@ -25,7 +25,7 @@ export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Cu
         },
     };
 
-    // Create the Customer:
+    // Update the Customer:
     try {
         const stripeCustomer: Stripe.Customer = await stripe.customers.update(customer.StripeCustomerId, params);
         return stripeCustomer;

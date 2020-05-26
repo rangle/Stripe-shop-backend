@@ -1,6 +1,6 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import {errorHandler, successHandler} from "../../utils/apiResponse";
-import {getCustomerItems, getItemProductAmounts} from "../../services/getCustomerCartUtils";
+import {getCustomerItems, getItemProductAmounts} from "../../services/db/getCustomerCartUtils";
 import {customerCreate} from "../../services/stripe/customerCreate";
 import {validatePaymentIntent} from "../../utils/PaymentIntentValidation";
 import {paymentIntentCreate} from "../../services/stripe/paymentIntentCreate";
