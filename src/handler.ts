@@ -11,10 +11,12 @@ export * from './api/catalog/getProducts';
 export * from './api/catalog/importProducts';
 
 export * from './api/cart/addCartItem';
-export * from './api/cart/getCarts';
+export * from './api/cart/getCustomerCart';
 
-export * from './api/orders/addOrder';
+export * from './api/orders/convertCartToOrder';
 export * from './api/orders/getOrder';
+export * from './api/orders/getOrders';
+export * from './api/orders/confirmOrder';
 
 export * from './api/terminal/capture';
 export * from './api/terminal/connect';
