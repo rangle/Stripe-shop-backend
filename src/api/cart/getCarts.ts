@@ -1,23 +1,24 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import { errorHandler, successHandler } from "../../utils/apiResponse";
-import {getCustomerItems} from "../../services/db/getCustomerCartUtils";
+import { dynamoDb } from "../../utils/db";
+import {errorHandler, successHandler} from "../../utils/apiResponse";
 
-export const getCarts: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+export const getCarts: Handler = (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
 
-    try {
-        const data = JSON.parse((event as APIGatewayEvent).body);
+    const data =  JSON.parse((event as APIGatewayEvent).body);
 
-        const items = await getCustomerItems(data.customerId);
+    const params = {
+        TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
+        Select: 'ALL_ATTRIBUTES',
+    };
 
-        return successHandler(
-            callBack,
-            items,
-        );
-    }catch(error) {
-        return errorHandler(
-            callBack,
-            'Error: getCarts failed with an exception',
-            error
-        );
-    }
-};
+    dynamoDb.get(params, (error, result) => {
+        // handle potential errors
+        if (error) {
+            console.error(error);
+            return errorHandler(callBack, 'ERROR: Couldn\'t fetch the order', error );
+        }
+        // create a response
+        return successHandler(callBack, result);
+
+    });
+}

@@ -36,7 +36,7 @@ export const addProduct: Handler = async (event: APIGatewayEvent | ScheduledEven
             });
             params.Item.stripeProductId = stripeProduct.id;
 
-            const interval = (data.interval && validInterval(data.interval)) ? data.interval : 'month';
+            const interval: Interval = (data.interval && validInterval(data.interval)) ? <Interval>data.interval : 'month';
             const stripePrice = await priceCreate({
                 productId: stripeProduct.id,
                 unit_amount: data.amount,

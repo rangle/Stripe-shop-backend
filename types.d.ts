@@ -1,94 +1,98 @@
-
 type PIMetaData = {
-    [name: string]: string | number | null;
+  [name: string]: string | number | null;
 };
 
 type DbError = {
-    [key: string]: string
+  [key: string]: string;
 };
+
+type DbLog = {
+  [key: string]: string;
+}[];
 
 type Currency = 'cad' | 'usd';
 type Interval = 'day' | 'week' | 'month' | 'year';
 type UsageType = 'licensed' | 'metered';
+type ProductId = string;
 
 type Product = {
-    productId: string,
-    name: string,
-    description: string,
-    amount: number,
-    hasSubscription?: boolean,
-    currency: Currency,
-    createdAt: number,
-    updatedAt: number,
-    stripeProductId?: string,
-    stripePriceId?: string,
-    interval?: string,
+  productId: ProductId;
+  name: string;
+  description: string;
+  amount: number;
+  hasSubscription?: boolean;
+  currency: Currency;
+  createdAt: number;
+  updatedAt: number;
+  stripeProductId?: string;
+  stripePriceId?: string;
+  interval?: string;
 };
 
 type Products = Product[];
 
 type StripeProductInput = {
-    name: string,
-    description: string,
-}
+  name: string;
+  description: string;
+};
 
 type StripeProduct = StripeProductInput & {
-    id: string,
-}
+  id: ProductId;
+};
 
 type StripePriceInput = {
-    product: string,
-    unit_amount: number,
-    currency: string,
-    interval: Interval,
-    usage_type?: UsageType,
-}
+  product: string;
+  unit_amount: number;
+  currency: string;
+  interval: Interval;
+  usage_type?: UsageType;
+};
 
 type StripePrice = {
-    id?: string,
-    product: string,
-    unit_amount: number,
-    currency: string,
-    recurring: {
-        interval: Interval,
-        usage_type?: UsageType,
-    },
-}
+  id?: string;
+  product: string;
+  unit_amount: number;
+  currency: string;
+  recurring: {
+    interval: Interval;
+    usage_type?: UsageType;
+  };
+};
 
 type StripeSubscriptionItems = {
-    price: string,
-    quantity: number,
-}
+  price: string;
+  quantity: number;
+};
 
 type StripeSubscription = {
-    customer: string,
-    items: StripeSubscriptionItems[],
-}
+  customer: string;
+  items: StripeSubscriptionItems[];
+};
 
 type ProductTable = {
-    TableName: string,
-    Item: Product,
+  TableName: string;
+  Item: Product;
 };
 
 type PaymentCommon = {
-    amount: number,
-    payment_method_types?: string[],
-    capture_method?: 'automatic' | 'manual',
-    off_session?: boolean,
-    setup_future_usage?: 'off_session' | 'on_session',
-    confirm?: boolean,
-    customer?: string,
-    description?: string,
-    metadata?: PIMetaData,
-}
+  amount: number;
+  payment_method_types?: string[];
+  capture_method?: 'automatic' | 'manual';
+  off_session?: boolean;
+  setup_future_usage?: 'off_session' | 'on_session';
+  confirm?: boolean;
+  customer?: string;
+  description?: string;
+  metadata?: PIMetaData;
+};
 
 type PaymentInput = PaymentCommon & {
-    orderId?: string,
-    currency?: Currency,
+  orderId?: string;
+  currency?: Currency;
 };
 
 type PaymentIntent = PaymentCommon & {
-    currency: Currency,
+  currency: Currency;
 };
 
 // // FROM STRIPE's TYPE FILE
@@ -125,107 +129,132 @@ type PaymentIntent = PaymentCommon & {
 //
 
 type Address = {
-    line1: string,
-    line2?: string,
-    city: string,
-    province?: string,
-    country: string,
-    postalCode: string,
+  line1: string;
+  line2?: string;
+  city: string;
+  province?: string;
+  country: string;
+  postalCode: string;
 };
 
 type CustomerInput = {
-    name?: string,
-    email?: string,
-    phone?: string,
-    address?: Address,
-    StripeCustomerId?: string
+  customerId?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: Address;
+  StripeCustomerId?: string;
 };
 
 type Customer = CustomerInput & {
-    customerId: string,
-    createdAt: number,
-    updatedAt: number,
+  customerId: string;
+  createdAt: number;
+  updatedAt: number;
 };
 
 type validCustomer = {
-    isValid: boolean,
-    error?: Error,
-    params?: Customer,
+  isValid: boolean;
+  error?: Error;
+  params?: Customer;
 };
 
 type CustomerTable = {
-    TableName: string,
-    Item?: Customer,
+  TableName: string;
+  Item?: Customer;
 };
 
 type BusinessInput = {
-    businessName: string,
-    contactName?: string,
-    email: string,
-    phone?: string,
-    address: Address,
-    info?: string,
-    website?: string,
+  businessName: string;
+  contactName?: string;
+  email: string;
+  phone?: string;
+  address: Address;
+  info?: string;
+  website?: string;
 };
 
-type Business = BusinessInput | {
-    businessId: string,
-    createdAt: number,
-    updatedAt: number,
-}
+type Business =
+  | BusinessInput
+  | {
+      businessId: string;
+      createdAt: number;
+      updatedAt: number;
+    };
 
 type validBusiness = {
-    isValid: boolean,
-    errors?: DbError,
-    params?: Business,
+  isValid: boolean;
+  errors?: DbError;
+  params?: Business;
 };
 
 type BusinessTable = {
-    TableName: string,
-    Item?: Business,
+  TableName: string;
+  Item?: Business;
 };
 
 type PostCartItem = {
-    customer: string,
-    item: string,
+  customer: string;
+  item: string;
 };
 
 type CartItem = {
-    cartItemId: string,
-    customerId: string,
-    productId: string,
-    quantity: number,
-    createdAt?: number,
-    updatedAt?: number,
+  cartItemId: string;
+  customerId: string;
+  productId: ProductId;
+  quantity: number;
+  createdAt?: number;
+  updatedAt?: number;
+  OrderPendingId?: string;
 };
 
 type CartItems = CartItem[];
 
 type CartTable = {
-    TableName: string,
-    Item: CartItem,
+  TableName: string;
+  Item: CartItem;
 };
 
 type OrderItem = {
-    name: string,
-    description?: string,
-    amount: number,
-    quantity: number,
+  productId: ProductId;
+  cartItemId: string;
+  quantity: number;
+  subtotal?: number;
 };
 
 type OrderItems = OrderItem[];
 
+type OrderInput = {
+  customerId: string;
+  orderTotal: number;
+  shippingAmount: number;
+};
+
+type OrderStatus = 'pending' | 'ordered' | 'shipped' | 'delivered';
+
+type Order = OrderInput & {
+  orderId: string;
+  products: OrderItems;
+  createdAt: number;
+  updatedAt: number;
+  currency?: 'cad' | 'usd';
+  orderStatus: OrderStatus;
+};
+
+type OrdersTable = {
+  TableName: string;
+  Item: Order;
+};
+
 type SubscriptionItem = {
-    productId: string,
-    stripePriceId: string,
-    quantity?: number,
-}
+  productId: string;
+  stripePriceId: string;
+  quantity?: number;
+};
 
 type SubscriptionItems = SubscriptionItem[];
 
 type Validation = {
-    errors?: DbError,
-    params?: PaymentIntent,
-    isValid: boolean,
+  errors?: DbError;
+  params?: PaymentIntent;
+  isValid: boolean;
 };
-

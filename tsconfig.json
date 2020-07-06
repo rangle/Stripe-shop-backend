@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "moduleResolution": "node",
+    "allowJs": true,
     "lib": [
       "es2018",
       "es2018.promise"

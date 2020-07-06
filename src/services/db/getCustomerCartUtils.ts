@@ -1,94 +1,61 @@
-import {dynamoDb, search} from "../../utils/db";
+import { search } from '../../utils/db';
 
 export const getCustomerItems = async (customerId: string): Promise<CartItems> => {
-        console.log('customerId', customerId)
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-            FilterExpression: 'customerId = :id',
-            ExpressionAttributeValues: {':id': customerId},
-        };
-        const customerItems =  await search(params);
-        console.log('customerItems', customerItems);
-        return customerItems;
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
+    FilterExpression: 'customerId = :id',
+    ExpressionAttributeValues: { ':id': customerId },
+  };
+  const customerItems = await search(params);
+  return customerItems;
 };
 
-export const getSubscriptionItems = (items: CartItems): Promise<SubscriptionItems> => {
-    return new Promise((resolve, reject) => {
-        let filterExpressionKeys = {};
-        for (let i = 0; i < items.length; i++) {
-            filterExpressionKeys[':p' + i] = items[i].productId;
-        }
-
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
-            FilterExpression: 'productId IN (' + Object.keys(filterExpressionKeys).join(',') + ')',
-            ExpressionAttributeValues: filterExpressionKeys,
-        };
-        console.log('getSubscriptionItems.params', params);
-        try {
-            dynamoDb.scan(params, (error, result) => {
-                // handle potential errors
-                console.log('results', result);
-                if (! result) {
-                    return reject({message: 'ERROR: getSubscriptionItems.DB empty'});
-                }
-                if (error) {
-                    return reject({message: 'ERROR: getSubscriptionItems.DB', error});
-                }
-                // create a response
-                console.log('getSubscriptionItems results: ', result);
-
-                return resolve(result.Items);
-            });
-        } catch (error) {
-            return reject({message: 'ERROR: getSubscriptionItems', error});
-        }
-    });
+export const getCustomerCart = async (customerId: string): Promise<CartItems> => {
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
+    FilterExpression: 'customerId = :id and attribute_not_exists(OrderPendingId)',
+    ExpressionAttributeValues: { ':id': customerId },
+  };
+  const customerItems = await search(params);
+  return customerItems;
 };
 
+export const getSubscriptionItems = async (items: CartItems): Promise<SubscriptionItems> => {
+  const filterExpressionKeys = items.reduce(
+    (filterExpression, item, index) => (filterExpression[':p' + index] = item.productId),
+    {}
+  );
 
-export const getItemProductAmounts = (items: CartItems): Promise<OrderItems> => {
-    return new Promise((resolve, reject) => {
-        let filterExpressionKeys = {};
-        for (let i = 0; i < items.length; i++) {
-            filterExpressionKeys[':p' + i] = items[i].productId;
-        }
-
-        const params = {
-            TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
-            FilterExpression: 'productId IN (' + Object.keys(filterExpressionKeys).join(',') + ')',
-            ExpressionAttributeValues: filterExpressionKeys
-        };
-        try {
-            dynamoDb.scan(params, (error, result) => {
-                // handle potential errors
-                console.log('results', result);
-                if (! result) {
-                    return reject({message: 'ERROR: getItemProductAmounts.DB empty'});
-                }
-                if (error) {
-                    return reject({message: 'ERROR: getItemProductAmounts.DB', error});
-                }
-                // create a response
-                console.log('productAmounts results: ', result);
-                return resolve(result.Items);
-            });
-        } catch (error) {
-            return reject({message: 'ERROR: getItemProductAmounts', error});
-        }
-    });
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
+    FilterExpression:
+      'productId IN (' +
+      Object.keys(filterExpressionKeys).join(',') +
+      ') and attribute_exists(stripePriceId)',
+    ExpressionAttributeValues: filterExpressionKeys,
+  };
+  console.log('getSubscriptionItems.params', params);
+  const subscriptionItems: SubscriptionItems = await search(params);
+  return subscriptionItems;
 };
 
-//
-// export const getOrderTotal = (customerID: string) => {
-//
-//     const customerItems = getCustomerItems(customerID);
-//     const products = Object.values(customerItems).map((item,i,accumulator) => {
-//         accumulator[':val' + i] = item.productId;
-//     });
-//     console.log('products', products);
-//     const myProductAmounts = getItemProducts(products);
-//
-//     return Object.values(myProductAmounts).reduce((total, product) => product.amount + total);
-// }
-
+export const getItemProducts = async (items: CartItems): Promise<Product[]> => {
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
+    FilterExpression: undefined,
+    ExpressionAttributeValues: undefined,
+  };
+  const filterExpressionKeys = items.reduce((filterExpression, item, index) => {
+    filterExpression[':p' + index] = item.productId;
+    return filterExpression;
+  }, {});
+  // console.log('filterExpressionKeys', filterExpressionKeys);
+  params.FilterExpression =
+    'productId IN (' +
+    Object.keys(filterExpressionKeys).join(',') +
+    ') and attribute_not_exists(stripePriceId)';
+  params.ExpressionAttributeValues = filterExpressionKeys;
+  // console.log('getItemProducts.paras', params);
+  const products: Product[] = await search(params);
+  return products;
+};

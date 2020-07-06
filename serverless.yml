@@ -89,10 +89,10 @@ provider:
     DYNAMODB_TABLE_CUSTOMERS: ${self:custom.tableNames.customers}
     DYNAMODB_TABLE_BUSINESSES: ${self:custom.tableNames.businesses}
     DYNAMODB_TABLE_PRODUCTS: ${self:custom.tableNames.products}
-    DYNAMODB_TABLE_ORDERS: ${self:custom.tableNames.products}
+    DYNAMODB_TABLE_ORDERS: ${self:custom.tableNames.orders}
     DYNAMODB_TABLE_CARTITEMS: ${self:custom.tableNames.cartItems}
     CONFIG_DYNAMODB_ENDPOINT: ${self:custom.endpoints.dynamodb-url}
-    STRIPE_API_KEY: 'sk_test_81qW27tAnNAkRSA2ZpAaaOtj003gCBIn1l'
+    STRIPE_API_KEY: 'sk_test_51FlyvzI87EouhiSs3gwb4ruMeEMfs3ithNKkdW3TBPooGA3wwgOAZBSLVgIP85J18duKOPkybiRQpyZk6ch2OY9o00YYJqmyda'
     STRIPE_API_VERSION: '2020-03-02'
 #    COGNITO_USER_POOL:
 #      'Fn::GetAtt': [ userPool, Arn ]
@@ -260,18 +260,18 @@ functions:
           method: post
           cors: true
   getCarts:
-    handler: src/handler.getCarts
+    handler: src/handler.getCustomerCart
     events:
       - http:
-          path: cart/getCarts
+          path: cart/getCustomerCart
           method: post
           cors: true
   # Orders
-  addOrder:
-    handler: src/handler.addOrder
+  convertCartToOrder:
+    handler: src/handler.convertCartToOrder
     events:
       - http:
-          path: orders/addOrder
+          path: orders/convertCartToOrder
           method: post
           cors: true
   getOrder:
@@ -279,7 +279,21 @@ functions:
     events:
       - http:
           path: orders/getOrder
+          method: post
+          cors: true
+  getOrders:
+    handler: src/handler.getOrders
+    events:
+      - http:
+          path: orders/getOrders
           method: get
+          cors: true
+  confirmOrder:
+    handler: src/handler.confirmOrder
+    events:
+      - http:
+          path: orders/confirmOrder
+          method: post
           cors: true
   #Terminal -- capturePaymentIntent
   createTerminalConnection:
