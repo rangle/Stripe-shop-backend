@@ -1,5 +1,7 @@
 import { errorHandler, successHandler } from './apiResponse';
 import 'source-map-support/register';
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
+import { paramTablePartial } from '../../types';
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
@@ -13,7 +15,7 @@ export const dynamoDb = isOffline
     })
   : new AWS.DynamoDB.DocumentClient();
 
-export const upsert = (params: any): Promise<any> => {
+export const upsert = (params: DocumentClient.PutItemInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     // params.ReturnValues = 'ALL_NEW';
     console.log('upsert(params)', params);
@@ -30,7 +32,7 @@ export const upsert = (params: any): Promise<any> => {
   });
 };
 
-export const updateItem = (params: any): Promise<any> => {
+export const updateItem = (params: DocumentClient.UpdateItemInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     // params.ReturnValues = 'ALL_NEW';
     console.log('updateItem(params)', params);
@@ -40,14 +42,14 @@ export const updateItem = (params: any): Promise<any> => {
         console.log('DB Error: Item update failed with ', error);
         reject({ error });
       } else {
-        console.log('DB SUCCESS: Item update resolved with ', params.Item);
-        resolve({ result: params.Item });
+        console.log('DB SUCCESS: Item update resolved with ', params.Key);
+        resolve({ result: params.Key });
       }
     });
   });
 };
 
-export const batchDelete = async (params, data, key) => {
+export const batchDelete = async (params, data: DocumentClient.ItemList, key) => {
   const log = [];
   await data.reduce(async (acc, item) => {
     console.log('batchDelete: item', item);
@@ -64,7 +66,7 @@ export const batchDelete = async (params, data, key) => {
   return log;
 };
 
-export const deleteItem = (params: any): Promise<any> => {
+export const deleteItem = (params: DocumentClient.DeleteItemInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     dynamoDb.delete(params, (error, result) => {
       if (error) {
@@ -79,7 +81,7 @@ export const deleteItem = (params: any): Promise<any> => {
   });
 };
 
-export const get = (params: any): Promise<any> => {
+export const get = (params: DocumentClient.GetItemInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     dynamoDb.get(params, (error, result) => {
       // handle potential errors
@@ -93,10 +95,10 @@ export const get = (params: any): Promise<any> => {
   });
 };
 
-export const search = (params: any): Promise<any> => {
+export const search = (params: DocumentClient.QueryInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     try {
-      dynamoDb.scan(params, (error, result) => {
+      dynamoDb.query(params, (error, result) => {
         // handle potential errors
         if (error) {
           return reject({ message: 'ERROR: DynamoDB.get', error });
@@ -114,7 +116,7 @@ export const search = (params: any): Promise<any> => {
   });
 };
 
-export const update = async (params: any): Promise<any> => {
+export const update = async (params: DocumentClient.UpdateItemInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     dynamoDb.update(params, (error, result) => {
       if (error) {
@@ -124,19 +126,28 @@ export const update = async (params: any): Promise<any> => {
   });
 };
 
-export const batchUpsert = async (data: any[], table: string): Promise<any[]> => {
-  const params: any = {
+export const batchUpsert = async (
+  data: DocumentClient.ItemList,
+  table: DocumentClient.TableName
+): Promise<any[]> => {
+  const params: paramTablePartial = {
     TableName: table,
   };
   return await putBatchData(data, params);
 };
 
-const putBatchData = async (data: any[], params: any): Promise<any[]> => {
+const putBatchData = async (
+  data: DocumentClient.ItemList,
+  params: paramTablePartial
+): Promise<any[]> => {
   const log = [];
   await data.reduce(async (acc, item) => {
-    params.Item = item;
+    const myparams: DocumentClient.PutItemInput = {
+      ...params,
+      Item: item,
+    };
     try {
-      await upsert(params);
+      await upsert(myparams);
       log.push({ success: item.name });
     } catch (error) {
       log.push({ failed: item.name });
@@ -145,7 +156,11 @@ const putBatchData = async (data: any[], params: any): Promise<any[]> => {
   return log;
 };
 
-export const updateBatchData = async (data: any[], params: any, key: string): Promise<any[]> => {
+export const updateBatchData = async (
+  data: DocumentClient.ItemList,
+  params: DocumentClient.UpdateItemInput,
+  key: string
+): Promise<any[]> => {
   const log = [];
   await data.reduce(async (acc, item) => {
     console.log('updateBatchData: item', item);

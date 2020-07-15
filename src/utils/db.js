@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -75,8 +86,8 @@ exports.updateItem = function (params) {
                 reject({ error: error });
             }
             else {
-                console.log('DB SUCCESS: Item update resolved with ', params.Item);
-                resolve({ result: params.Item });
+                console.log('DB SUCCESS: Item update resolved with ', params.Key);
+                resolve({ result: params.Key });
             }
         });
     });
@@ -149,7 +160,7 @@ exports.get = function (params) {
 exports.search = function (params) {
     return new Promise(function (resolve, reject) {
         try {
-            exports.dynamoDb.scan(params, function (error, result) {
+            exports.dynamoDb.query(params, function (error, result) {
                 // handle potential errors
                 if (error) {
                     return reject({ message: 'ERROR: DynamoDB.get', error: error });
@@ -198,15 +209,15 @@ var putBatchData = function (data, params) { return __awaiter(void 0, void 0, vo
             case 0:
                 log = [];
                 return [4 /*yield*/, data.reduce(function (acc, item) { return __awaiter(void 0, void 0, void 0, function () {
-                        var error_2;
+                        var myparams, error_2;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    params.Item = item;
+                                    myparams = __assign(__assign({}, params), { Item: item });
                                     _a.label = 1;
                                 case 1:
                                     _a.trys.push([1, 3, , 4]);
-                                    return [4 /*yield*/, exports.upsert(params)];
+                                    return [4 /*yield*/, exports.upsert(myparams)];
                                 case 2:
                                     _a.sent();
                                     log.push({ success: item.name });

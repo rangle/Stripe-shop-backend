@@ -1,3 +1,5 @@
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
+
 type PIMetaData = {
   [name: string]: string | number | null;
 };
@@ -257,4 +259,24 @@ type Validation = {
   errors?: DbError;
   params?: PaymentIntent;
   isValid: boolean;
+};
+
+/**
+ * DynamoDB Types
+ **/
+type ExpressionAttributeValuesTypes = {
+  [key: string]: { [key: string]: string };
+};
+
+type paramTablePartial = {
+  TableName: DocumentClient.TableName;
+  Item?: DocumentClient.PutItemInputAttributeMap;
+};
+
+type queryParamsType = {
+  Limit: number;
+  KeyConditionExpression: string;
+  ProjectionExpression: string;
+  FilterExpression?: string;
+  TableName: string;
 };
