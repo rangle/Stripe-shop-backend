@@ -154,7 +154,7 @@ type Customer = CustomerInput & {
   updatedAt: number;
 };
 
-type validCustomer = {
+type ValidCustomer = {
   isValid: boolean;
   error?: Error;
   params?: Customer;

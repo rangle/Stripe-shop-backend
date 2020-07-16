@@ -81,13 +81,13 @@ export const deleteItem = (params: DocumentClient.DeleteItemInput): Promise<any>
   });
 };
 
-export const get = (params: DocumentClient.GetItemInput): Promise<any> => {
+export const scan = (params: DocumentClient.ScanInput): Promise<any> => {
   return new Promise((resolve, reject) => {
-    dynamoDb.get(params, (error, result) => {
+    dynamoDb.scan(params, (error, result) => {
       // handle potential errors
       if (error) {
         console.error(error);
-        return reject({ error: "ERROR: Couldn't fetch the order", message: error });
+        return reject({ error: "ERROR: Couldn't scan table" + params.TableName, message: error });
       }
       // create a response
       return resolve(result);

@@ -3,6 +3,7 @@ import { errorHandler, successHandler } from '../../utils/apiResponse';
 import { validateCustomer } from '../../utils/CustomerValidations';
 import { stripeCustomerUpsert } from '../../services/stripe/stripeCustomerUpsert';
 import { customerWrite } from '../../services/db/customerWrite';
+import { CustomerInput, ValidCustomer } from '../../../types';
 
 type saveCustomer = {
   isSaveCustomer: number;
@@ -15,7 +16,7 @@ export const addCustomer: Handler = async (
 ) => {
   const data: CustomerInput & saveCustomer = JSON.parse((event as APIGatewayEvent).body);
   console.log('incomming data', data);
-  const validCustomer: validCustomer = validateCustomer(data);
+  const validCustomer: ValidCustomer = validateCustomer(data);
 
   if (!validCustomer.isValid) {
     return errorHandler(callBack, 'ERROR: Customer contains invalid data.', validCustomer.error);

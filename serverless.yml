@@ -134,13 +134,13 @@ provider:
               - "index/*"
 functions:
   # Payment Intents
-  createPaymentIntent:
-    handler: src/handler.createPaymentIntent
-    events:
-      - http:
-          path: paymentIntent/create
-          method: post
-          cors: true
+#  createPaymentIntent:
+#    handler: src/handler.createPaymentIntent
+#    events:
+#      - http:
+#          path: paymentIntent/create
+#          method: post
+#          cors: true
   getPaymentIntents:
     handler: src/handler.getPaymentIntents
     events:
@@ -178,7 +178,6 @@ functions:
           path: catalog/getProducts
           method: get
           cors: true
-
   addProduct:
     handler: src/handler.addProduct
     events:
@@ -223,34 +222,34 @@ functions:
           method: get
           cors: true
   # Business
-  addBusiness:
-    handler: src/handler.addBusiness
-    events:
-      - http:
-          path: business/addBusiness
-          method: post
-          cors: true
-  importBusinesss:
-    handler: src/handler.importBusinesses
-    events:
-      - http:
-          path: business/importBusinesses
-          method: post
-          cors: true
-  getBusiness:
-    handler: src/handler.getBusiness
-    events:
-      - http:
-          path: business/getBusiness
-          method: post
-          cors: true
-  getBusinesses:
-    handler: src/handler.getBusinesses
-    events:
-      - http:
-          path: business/getBusinesses
-          method: get
-          cors: true
+#  addBusiness:
+#    handler: src/handler.addBusiness
+#    events:
+#      - http:
+#          path: business/addBusiness
+#          method: post
+#          cors: true
+#  importBusinesss:
+#    handler: src/handler.importBusinesses
+#    events:
+#      - http:
+#          path: business/importBusinesses
+#          method: post
+#          cors: true
+#  getBusiness:
+#    handler: src/handler.getBusiness
+#    events:
+#      - http:
+#          path: business/getBusiness
+#          method: post
+#          cors: true
+#  getBusinesses:
+#    handler: src/handler.getBusinesses
+#    events:
+#      - http:
+#          path: business/getBusinesses
+#          method: get
+#          cors: true
   # Cart Items
   addCartItem:
     handler: src/handler.addCartItem
