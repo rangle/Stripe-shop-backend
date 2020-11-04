@@ -1,17 +1,14 @@
 import {
   batchDelete,
-  deleteItem,
-  dynamoDb,
-  search,
-  update,
+  query,
   updateBatchData,
   updateItem,
   upsert,
 } from '../../utils/db';
-import { getCustomerCart, getCustomerItems, getItemProducts } from './getCustomerCartUtils';
-import { log } from 'util';
+import { getCustomerCart, getCustomerItems, getProductItems } from './getCustomerCartUtils';
+import { CartItems, Order, OrderItems, OrdersTable, OrderStatus, Product } from 'src/types';
 
-const uuid = require('uuid');
+import uuid = require('uuid');
 const timestamp = new Date().getTime();
 
 export const getCustomerOrders = async (customerId: string): Promise<CartItems> => {
@@ -22,7 +19,7 @@ export const getCustomerOrders = async (customerId: string): Promise<CartItems> 
     FilterExpression: 'customerId = :id',
     ExpressionAttributeValues: { ':id': customerId },
   };
-  const customerItems = await search(params);
+  const customerItems = await query(params);
   console.log('customerItems', customerItems);
 
   return customerItems;
@@ -83,7 +80,9 @@ export const customerCartToOrder = async ({
       console.log('cart empty');
       throw new Error('The cart contains no items');
     }
-    const products: Product[] = await getItemProducts(cartItems);
+    console.log('cart items: ', cartItems);
+
+    const products: Product[] = await getProductItems(cartItems);
     const orderTotal: number = products.reduce((acc, prod) => (acc += prod.amount), 0);
     const orderItems: OrderItems = cartItems.reduce((orderItems: OrderItems, item): OrderItems => {
       const orderItem = {
@@ -94,7 +93,7 @@ export const customerCartToOrder = async ({
       };
       return [...orderItems, orderItem];
     }, []);
-
+    console.log('products from getItemProducts', { products, orderItems });
     const order: Order = await saveCustomerOrder(
       customerId,
       orderItems,
@@ -107,6 +106,7 @@ export const customerCartToOrder = async ({
     return order;
   } catch (error) {
     console.log('unable to save order', error);
+    throw new Error(error);
   }
 };
 

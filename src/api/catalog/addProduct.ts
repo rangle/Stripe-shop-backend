@@ -4,8 +4,9 @@ import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {productCreate} from "../../services/stripe/productCreate";
 import {validInterval} from "../../utils/ProductValidations";
 import {priceCreate} from "../../services/stripe/priceCreate";
+import { Interval, Product, ProductTable } from '@/types';
 
-const uuid = require('uuid');
+const uuid = require('uuid');uuid.v1(),
 
 console.log('process.env.DYNAMODB_TABLE_PRODUCTS', process.env.DYNAMODB_TABLE_PRODUCTS);
 
@@ -34,7 +35,7 @@ export const addProduct: Handler = async (event: APIGatewayEvent | ScheduledEven
                 name: data.name,
                 description: data.description,
             });
-            params.Item.stripeProductId = stripeProduct.id;
+            params.Item.stripe.ProductId = stripeProduct.id;
 
             const interval: Interval = (data.interval && validInterval(data.interval)) ? <Interval>data.interval : 'month';
             const stripePrice = await priceCreate({
@@ -43,7 +44,7 @@ export const addProduct: Handler = async (event: APIGatewayEvent | ScheduledEven
                 currency: currency,
                 interval: interval,
             });
-            params.Item.stripePriceId = stripePrice.id;
+            params.Item.stripe.PriceId = stripePrice.id;
             params.Item.interval = interval;
         }
 

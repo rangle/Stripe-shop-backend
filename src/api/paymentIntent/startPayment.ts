@@ -1,6 +1,6 @@
 import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
-import { getCustomerItems, getItemProducts } from '../../services/db/getCustomerCartUtils';
+import { getCustomerItems, getProductItems } from '../../services/db/getCustomerCartUtils';
 import { customerCreate } from '../../services/stripe/customerCreate';
 import { validatePaymentIntent } from '../../utils/PaymentIntentValidation';
 import { paymentIntentCreate } from '../../services/stripe/paymentIntentCreate';
@@ -26,7 +26,7 @@ export const startPayment: Handler = async (
       return errorHandler(callBack, 'ERROR startPayment FAILED!', 'Your Cart is Empty');
     }
 
-    const products: Product[] = await getItemProducts(items);
+    const products: Product[] = await getProductItems(items);
     const total: number = products.reduce((acc, prod) => (acc += prod.amount), 0);
     const stripePI: PaymentInput = {
       amount: total,

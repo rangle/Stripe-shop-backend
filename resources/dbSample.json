@@ -1,0 +1,42 @@
+{
+  "Items": [
+    {
+      "PK": "CUST_918470123983789023987",
+      "SK": "EMAIL_ken.easson@gmail.com",
+      "GSA1": "PHONE_3215551212",
+      "Name": "Ken Easson",
+      "Address": {
+        "Line1": "123 Anywhere",
+        "City": "Ajax",
+        "Province": "Ontario",
+        "Code": "L1S3Z8"
+      }
+    },
+    {
+      "PK": "CUST_91847012398378f9023987",
+      "SK": "ITEM_678345b23409a789d9871f",
+      "GSA1": "inCart_450982abaf789ff987a2",
+      "product": {
+        "name": "widget",
+        "description": "A really cool thing people will buy",
+        "amount": "12.75",
+        "interval": "monthly",
+        "stripeId": "pri_C345DA123E"
+      },
+      "quantity": 1,
+      "itemType": "subscription_789ff23498c71123e4789a"
+    },
+    {
+      "PK": "CUST_918470123983789023987",
+      "SK": "ITEM_afd09f87afe907890fd5a",
+      "GSA1": "shipped_450982abaf789ff987a2",
+      "product": {
+        "name": "whomathingy",
+        "description": "A really cool thing people will buy",
+        "amount": "7.95"
+      },
+      "quantity": 1,
+      "itemType": "product_asdf9873498c711asdf987a"
+    }
+  ]
+}

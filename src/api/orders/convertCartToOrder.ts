@@ -2,6 +2,7 @@ import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws
 import { dynamoDb } from '../../utils/db';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
 import { customerCartToOrder } from '../../services/db/customerOrderUtils';
+import { OrderInput } from 'src/types';
 
 export const convertCartToOrder: Handler = async (
   event: APIGatewayEvent | ScheduledEvent,

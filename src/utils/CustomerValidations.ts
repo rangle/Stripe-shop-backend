@@ -1,12 +1,13 @@
 import uuid = require('uuid');
-import { Customer, CustomerInput, DbError } from '../../types';
+import { Customer, CustomerInput, DbError } from 'src/types';
+import { CUSTOMER_PREFIX } from 'src/utils/constants/db_entity_constants';
 
 export const validateCustomer = (dataIn: CustomerInput) => {
   const errors: DbError = {};
   const timestamp = new Date().getTime();
 
   const params: Customer = {
-    customerId: dataIn.customerId ? dataIn.customerId : uuid.v1(),
+    customerId: dataIn.customerId ? dataIn.customerId : CUSTOMER_PREFIX + uuid.v1(),
     createdAt: timestamp,
     updatedAt: timestamp,
   };

@@ -1,61 +1,55 @@
-import { search } from '../../utils/db';
+import { batchGet, query } from '../../utils/db';
+import { CartItems, OrderStatuses, Product, SubscriptionItems } from 'src/types';
 
-export const getCustomerItems = async (customerId: string): Promise<CartItems> => {
+
+
+export const getCustomerItems = async ({ customerId, orderStatus }: { customerId: string, orderStatus: OrderStatuses }): Promise<CartItems> => {
   const params = {
-    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-    FilterExpression: 'customerId = :id',
+    TableName: process.env.DYNAMODB_TABLE_SHOPPING,
+    IndexName: 'customerId',
+    KeyConditionExpression: 'customerId = :id',
     ExpressionAttributeValues: { ':id': customerId },
   };
-  const customerItems = await search(params);
+  const customerItems = await query(params);
   return customerItems;
 };
 
 export const getCustomerCart = async (customerId: string): Promise<CartItems> => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-    FilterExpression: 'customerId = :id and attribute_not_exists(OrderPendingId)',
+    IndexName: 'customerId',
+    KeyConditionExpression: 'customerId = :id',
     ExpressionAttributeValues: { ':id': customerId },
+    FilterExpression: 'attribute_not_exists(OrderPendingId)',
   };
-  const customerItems = await search(params);
+  const customerItems = await query(params);
   return customerItems;
 };
 
-export const getSubscriptionItems = async (items: CartItems): Promise<SubscriptionItems> => {
-  const filterExpressionKeys = items.reduce(
-    (filterExpression, item, index) => (filterExpression[':p' + index] = item.productId),
-    {}
-  );
-
-  const params = {
-    TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
-    FilterExpression:
-      'productId IN (' +
-      Object.keys(filterExpressionKeys).join(',') +
-      ') and attribute_exists(stripePriceId)',
-    ExpressionAttributeValues: filterExpressionKeys,
-  };
-  console.log('getSubscriptionItems.params', params);
-  const subscriptionItems: SubscriptionItems = await search(params);
-  return subscriptionItems;
+export const getSubscriptionItems = async (items: CartItems): Promise<Product[]> => {
+  const products: Product[] = await getItems(items);
+  const subscriptionProducts: Product[] = products.filter((product) => product.hasSubscription)
+  return subscriptionProducts;
 };
 
-export const getItemProducts = async (items: CartItems): Promise<Product[]> => {
+export const getProductItems = async (items: CartItems): Promise<Product[]> => {
+  const products: Product[] = await getItems(items);
+  const itemProducts: Product[] = products.filter((product) => !product.hasSubscription)
+  return itemProducts;
+};
+
+export const getItems = async (items: CartItems): Promise<Product[]> => {
   const params = {
-    TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
-    FilterExpression: undefined,
-    ExpressionAttributeValues: undefined,
+    RequestItems: {
+      [process.env.DYNAMODB_TABLE_PRODUCTS]: {
+        Keys: items.reduce((productIds, item, index) => {
+            return [...productIds,
+              { productId: item.productId },
+            ];
+          }, []),
+      },
+    },
   };
-  const filterExpressionKeys = items.reduce((filterExpression, item, index) => {
-    filterExpression[':p' + index] = item.productId;
-    return filterExpression;
-  }, {});
-  // console.log('filterExpressionKeys', filterExpressionKeys);
-  params.FilterExpression =
-    'productId IN (' +
-    Object.keys(filterExpressionKeys).join(',') +
-    ') and attribute_not_exists(stripePriceId)';
-  params.ExpressionAttributeValues = filterExpressionKeys;
-  // console.log('getItemProducts.paras', params);
-  const products: Product[] = await search(params);
+  const products: Product[] = await batchGet(params);
   return products;
 };

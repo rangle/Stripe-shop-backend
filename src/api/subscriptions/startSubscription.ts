@@ -8,6 +8,7 @@ import {customerRead} from "../../services/db/customerRead";
 import {customerCreate} from "../../services/stripe/customerCreate";
 import {customerWrite} from "../../services/db/customerWrite";
 import {subscriptionCreate} from "../../services/stripe/subscriptionCreate";
+import { CartItems, StripeSubscriptionItems } from 'src/types';
 
 export const startSubscription: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
     /**

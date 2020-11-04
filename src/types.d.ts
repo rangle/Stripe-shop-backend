@@ -5,8 +5,9 @@ type PIMetaData = {
 };
 
 type DbError = {
-  [key: string]: string;
-};
+  message: string,
+  error?: Error | string,
+}
 
 type DbLog = {
   [key: string]: string;
@@ -19,6 +20,7 @@ type ProductId = string;
 
 type Product = {
   productId: ProductId;
+  itemType?: ItemTypes;
   name: string;
   description: string;
   amount: number;
@@ -26,8 +28,11 @@ type Product = {
   currency: Currency;
   createdAt: number;
   updatedAt: number;
-  stripeProductId?: string;
-  stripePriceId?: string;
+  stripe?: {
+    Id: string,
+    ProductId?: string,
+    PriceId?: string;
+  };
   interval?: string;
 };
 
@@ -71,6 +76,14 @@ type StripeSubscription = {
   items: StripeSubscriptionItems[];
 };
 
+type SubscriptionItem = {
+  productId: string;
+  stripePriceId: string;
+  quantity?: number;
+};
+
+type SubscriptionItems = SubscriptionItem[];
+
 type ProductTable = {
   TableName: string;
   Item: Product;
@@ -97,39 +110,6 @@ type PaymentIntent = PaymentCommon & {
   currency: Currency;
 };
 
-// // FROM STRIPE's TYPE FILE
-// interface paymentIntentCheckInput {
-//     amount: number;
-//     currency: string;
-//     application_fee_amount?: number;
-//     capture_method?: PaymentIntentCreateParams.CaptureMethod;
-//     confirm?: boolean;
-//     confirmation_method?: PaymentIntentCreateParams.ConfirmationMethod;
-//     customer?: string;
-//     description?: string;
-//     error_on_requires_action?: boolean;
-//     expand?: Array<string>;
-//     mandate?: string;
-//     mandate_data?: PaymentIntentCreateParams.MandateData;
-//     off_session?: boolean | PaymentIntentCreateParams.OffSession;
-//     on_behalf_of?: string;
-//     payment_method?: string;
-//     payment_method_options?: PaymentIntentCreateParams.PaymentMethodOptions;
-//     payment_method_types?: Array<string>;
-//     receipt_email?: string;
-//     return_url?: string;
-//     save_payment_method?: boolean;
-//     setup_future_usage?: PaymentIntentCreateParams.SetupFutureUsage;
-//     shipping?: PaymentIntentCreateParams.Shipping;
-//     source?: string;
-//     statement_descriptor?: string;
-//     statement_descriptor_suffix?: string;
-//     transfer_data?: PaymentIntentCreateParams.TransferData;
-//     transfer_group?: string;
-//     use_stripe_sdk?: boolean;
-// }
-//
-
 type Address = {
   line1: string;
   line2?: string;
@@ -149,7 +129,6 @@ type CustomerInput = {
 };
 
 type Customer = CustomerInput & {
-  customerId: string;
   createdAt: number;
   updatedAt: number;
 };
@@ -158,11 +137,6 @@ type ValidCustomer = {
   isValid: boolean;
   error?: Error;
   params?: Customer;
-};
-
-type CustomerTable = {
-  TableName: string;
-  Item?: Customer;
 };
 
 type BusinessInput = {
@@ -189,71 +163,28 @@ type validBusiness = {
   params?: Business;
 };
 
-type BusinessTable = {
-  TableName: string;
-  Item?: Business;
-};
-
 type PostCartItem = {
   customer: string;
   item: string;
 };
 
-type CartItem = {
-  cartItemId: string;
-  customerId: string;
-  productId: ProductId;
+type OrderStatuses = 'inCart' |  'ordered' | 'paid' | 'shipped' | 'delivered';
+type ItemTypes = 'product' | 'licence' | 'service' | 'subscription';
+
+type Item = {
+  product: Product;
   quantity: number;
   createdAt?: number;
   updatedAt?: number;
-  OrderPendingId?: string;
+  orderStatus: OrderStatuses;
 };
 
-type CartItems = CartItem[];
+type UpsertItem = Item & {
+  SK: string, // `ITEM_${uuid}`
+  PK: string, // CustomerId
+}
 
-type CartTable = {
-  TableName: string;
-  Item: CartItem;
-};
-
-type OrderItem = {
-  productId: ProductId;
-  cartItemId: string;
-  quantity: number;
-  subtotal?: number;
-};
-
-type OrderItems = OrderItem[];
-
-type OrderInput = {
-  customerId: string;
-  orderTotal: number;
-  shippingAmount: number;
-};
-
-type OrderStatus = 'pending' | 'ordered' | 'shipped' | 'delivered';
-
-type Order = OrderInput & {
-  orderId: string;
-  products: OrderItems;
-  createdAt: number;
-  updatedAt: number;
-  currency?: 'cad' | 'usd';
-  orderStatus: OrderStatus;
-};
-
-type OrdersTable = {
-  TableName: string;
-  Item: Order;
-};
-
-type SubscriptionItem = {
-  productId: string;
-  stripePriceId: string;
-  quantity?: number;
-};
-
-type SubscriptionItems = SubscriptionItem[];
+type Items = Item[];
 
 type Validation = {
   errors?: DbError;
@@ -261,22 +192,6 @@ type Validation = {
   isValid: boolean;
 };
 
-/**
- * DynamoDB Types
- **/
-type ExpressionAttributeValuesTypes = {
-  [key: string]: { [key: string]: string };
-};
-
-type paramTablePartial = {
+type OnlyTableName = {
   TableName: DocumentClient.TableName;
-  Item?: DocumentClient.PutItemInputAttributeMap;
-};
-
-type queryParamsType = {
-  Limit: number;
-  KeyConditionExpression: string;
-  ProjectionExpression: string;
-  FilterExpression?: string;
-  TableName: string;
-};
+}

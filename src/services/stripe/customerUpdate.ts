@@ -1,4 +1,5 @@
 import { Stripe } from 'stripe';
+import { CustomerInput } from 'src/types';
 
 export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Customer> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {

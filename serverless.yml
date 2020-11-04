@@ -42,11 +42,9 @@ custom:
 #    timeout: 20
 #    prewarm: true
   tableNames:
-    cartItems: ${self:service}-${opt:stage, self:provider.stage}-cartItems01
-    customers: ${self:service}-${opt:stage, self:provider.stage}-customers01
     businesses: ${self:service}-${opt:stage, self:provider.stage}-businesses01
-    orders: ${self:service}-${opt:stage, self:provider.stage}-orders01
     products: ${self:service}-${opt:stage, self:provider.stage}-catalog01
+    shopping: ${self:service}-${opt:stage, self:provider.stage}-shopping
   dynamodb:
     start:
       port: 8000
@@ -55,10 +53,8 @@ custom:
       seed: false
     stages:
       - dev
-  CartItemsTableName: ${self:custom.tableNames.cartItems}
-  CustomersTableName: ${self:custom.tableNames.customers}
+  ShoppingTableName: ${self:custom.tableNames.shopping}
   BusinessesTableName: ${self:custom.tableNames.businesses}
-  OrdersTableName: ${self:custom.tableNames.orders}
   ProductsTableName: ${self:custom.tableNames.products}
   TableWriteCap: 2
   TableReadCap: 2
@@ -86,11 +82,10 @@ provider:
   stage: dev
   region: us-east-1
   environment:
-    DYNAMODB_TABLE_CUSTOMERS: ${self:custom.tableNames.customers}
+    DYNAMODB_TABLE_SHOPPING: ${self:custom.tableNames.shopping}
     DYNAMODB_TABLE_BUSINESSES: ${self:custom.tableNames.businesses}
     DYNAMODB_TABLE_PRODUCTS: ${self:custom.tableNames.products}
-    DYNAMODB_TABLE_ORDERS: ${self:custom.tableNames.orders}
-    DYNAMODB_TABLE_CARTITEMS: ${self:custom.tableNames.cartItems}
+
     CONFIG_DYNAMODB_ENDPOINT: ${self:custom.endpoints.dynamodb-url}
     STRIPE_API_KEY: 'sk_test_51FlyvzI87EouhiSs3gwb4ruMeEMfs3ithNKkdW3TBPooGA3wwgOAZBSLVgIP85J18duKOPkybiRQpyZk6ch2OY9o00YYJqmyda'
     STRIPE_API_VERSION: '2020-03-02'
@@ -103,6 +98,7 @@ provider:
         - dynamodb:Query
         - dynamodb:Scan
         - dynamodb:GetItem
+        - dynamodb:GetBatchItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
@@ -112,25 +108,15 @@ provider:
           - '/'
           - - Fn::GetAtt: [ ProductsTable, Arn ]
             - "index/*"
-        - Fn::GetAtt: [OrdersTable, Arn]
+        - Fn::GetAtt: [ShoppingTable, Arn]
         - Fn::Join:
           - '/'
-          - - Fn::GetAtt: [ OrdersTable, Arn ]
+          - - Fn::GetAtt: [ ShoppingTable, Arn ]
             - "index/*"
         - Fn::GetAtt: [BusinessesTable, Arn]
         - Fn::Join:
             - '/'
             - - Fn::GetAtt: [ BusinessesTable, Arn ]
-              - "index/*"
-        - Fn::GetAtt: [CustomersTable, Arn]
-        - Fn::Join:
-            - '/'
-            - - Fn::GetAtt: [ CustomersTable, Arn ]
-              - "index/*"
-        - Fn::GetAtt: [CartItemsTable, Arn]
-        - Fn::Join:
-            - '/'
-            - - Fn::GetAtt: [ CartItemsTable, Arn ]
               - "index/*"
 functions:
   # Payment Intents
@@ -359,9 +345,7 @@ functions:
 
 resources:
   - ${file(resources/dynamodb-table-products.yml)}
-  - ${file(resources/dynamodb-table-orders.yml)}
-  - ${file(resources/dynamodb-table-cartItems.yml)}
-  - ${file(resources/dynamodb-table-customer.yml)}
+  - ${file(resources/dynamodb-table-shopping.yml)}
   - ${file(resources/dynamodb-table-business.yml)}
           #  Resources:
           #      userPool:

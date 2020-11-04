@@ -1,4 +1,4 @@
-export * from './api/paymentIntent/createPaymentIntent';
+// export * from './api/paymentIntent/createPaymentIntent';
 export * from './api/paymentIntent/cancelPaymentIntent';
 export * from './api/paymentIntent/getPaymentIntents';
 
@@ -26,9 +26,9 @@ export * from './api/customer/getCustomer';
 export * from './api/customer/getCustomers';
 export * from './api/customer/importCustomers';
 
-export * from './api/business/addBusiness';
-export * from './api/business/getBusiness';
-export * from './api/business/getBusinesses';
-export * from './api/business/importBusinesses';
+// export * from './api/business/addBusiness';
+// export * from './api/business/getBusiness';
+// export * from './api/business/getBusinesses';
+// export * from './api/business/importBusinesses';
 
 export * from './api/webhook/listener'

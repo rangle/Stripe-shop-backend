@@ -3,7 +3,7 @@ import { errorHandler, successHandler } from '../../utils/apiResponse';
 import { validateCustomer } from '../../utils/CustomerValidations';
 import { stripeCustomerUpsert } from '../../services/stripe/stripeCustomerUpsert';
 import { customerWrite } from '../../services/db/customerWrite';
-import { CustomerInput, ValidCustomer } from '../../../types';
+import { CustomerInput, ValidCustomer } from 'src/types';
 
 type saveCustomer = {
   isSaveCustomer: number;

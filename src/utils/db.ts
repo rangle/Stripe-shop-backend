@@ -1,7 +1,7 @@
 import { errorHandler, successHandler } from './apiResponse';
 import 'source-map-support/register';
 import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
-import { paramTablePartial } from '../../types';
+import { DbError, OnlyTableName } from 'src/types';
 
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 
@@ -95,7 +95,7 @@ export const scan = (params: DocumentClient.ScanInput): Promise<any> => {
   });
 };
 
-export const search = (params: DocumentClient.QueryInput): Promise<any> => {
+export const query = (params: DocumentClient.QueryInput): Promise<any> => {
   return new Promise((resolve, reject) => {
     try {
       dynamoDb.query(params, (error, result) => {
@@ -126,11 +126,64 @@ export const update = async (params: DocumentClient.UpdateItemInput): Promise<an
   });
 };
 
+export const get = async (params: DocumentClient.GetItemInput, filter = null): Promise<DocumentClient.GetItemOutput> => {
+  return new Promise((resolve, reject) => {
+    try {
+      dynamoDb.get(params, (error, result) => {
+        console.log('dynamoDb.get', { error, result });
+        if (error) {
+          return reject({ message: 'ERROR: DynamoDB.get', error });
+        }
+        if (!result) {
+          return reject({ message: 'ERROR: DynamoDB.get empty' });
+        }
+        console.log('SUCCESS: DynamoDB.batchGet: ', result);
+        return resolve(result);
+      });
+    } catch (error) {
+      return reject({ message: 'ERROR: DynamoDB.batchGet', error });
+    }
+  });
+};
+
+export const batchGetFilter = async (params: DocumentClient.BatchGetItemInput, filter): Promise<any> => {
+  try {
+    const response = await batchGet(params);
+    console.log('batchGetFilter', response);
+
+  } catch (error) {
+    console.log('batchGetFilter ERROR:', error);
+    throw new Error(error);
+  }
+};
+
+export const batchGet = async (params: DocumentClient.BatchGetItemInput): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    try {
+
+      dynamoDb.batchGet(params, (error, result) => {
+        // handle potential errors
+        if (error) {
+          return reject({ message: 'ERROR: DynamoDB.batchGet', error });
+        }
+        if (!result) {
+          return reject({ message: 'ERROR: DynamoDB.batchGet empty' });
+        }
+        // create a response
+        console.log('SUCCESS: DynamoDB.batchGet: ', result);
+        return resolve(result.Responses);
+      });
+    } catch (error) {
+      return reject({ message: 'ERROR: DynamoDB.batchGet', error });
+    }
+  });
+};
+
 export const batchUpsert = async (
   data: DocumentClient.ItemList,
   table: DocumentClient.TableName
 ): Promise<any[]> => {
-  const params: paramTablePartial = {
+  const params: OnlyTableName = {
     TableName: table,
   };
   return await putBatchData(data, params);
@@ -138,7 +191,7 @@ export const batchUpsert = async (
 
 const putBatchData = async (
   data: DocumentClient.ItemList,
-  params: paramTablePartial
+  params: OnlyTableName,
 ): Promise<any[]> => {
   const log = [];
   await data.reduce(async (acc, item) => {
