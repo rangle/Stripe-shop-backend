@@ -1,0 +1,85 @@
+{
+  "Shopping": [
+    {
+      "PK": "CUSTOMER",
+      "SK": "CUST_918470123983789023987",
+      "GSA1": "CANADA_ON_AJAX",
+      "GSA2": "EMAIL_ken.easson@gmail.com",
+      "GSA3": "PHONE_3215551212",
+      "name": "Ken Easson",
+      "address": {
+        "Line1": "123 Anywhere",
+        "City": "Ajax",
+        "Province": "Ontario",
+        "Country": "Canada",
+        "Code": "L1S3Z8"
+      }
+    },
+    {
+      "PK": "CUST_91847012398378f9023987",
+      "SK": "ITEM_678345b23409a789d9871f",
+      "GSA1": "allocated_YYYYMMDDHHIISS",
+      "GSA2": "PI_1340A912D908241CD30981A23489F01234B987234890A134A907",
+      "GSA4": "subscription",
+      "product": {
+        "name": "widget",
+        "description": "A really cool thing people will subscribe to",
+        "purchase_price": "12.75"
+      },
+      "payments": [
+        {
+          "type": "stripe",
+          "data": {
+            "id": "PI_1340A912D908241CD30981A23489F01234B987234890A134A907",
+            "amount": 34.99
+          }
+        },
+        {
+          "type": "cash",
+          "data": {
+            "id": "1234",
+            "amount": 10.00
+          }
+        }
+      ],
+      "shipping": {
+        "address": {
+          "Line1": "123 Anywhere",
+          "City": "Ajax",
+          "Province": "Ontario",
+          "Country": "Canada",
+          "Code": "L1S3Z8"
+        },
+        "method": {
+          "shipper": "fedex",
+          "shipping_method": "overnight",
+          "shipping_costs": "23.75"
+        }
+      },
+      "quantity": 1,
+      "terms": {
+        "interval": "monthly",
+        "renewal": "auto-renew",
+        "term": "1 year",
+        "start-date": "20190712",
+        "end-date": "20200711",
+        "rate": 34.99
+      }
+    },
+    {
+      "PK": "REVIEW",
+      "SK": "ITEM_afd09f87afe907890fd5a",
+      "GSA1": "CUST_918470123983789023987",
+      "GSA4": "20200414T102344",
+      "product": {
+        "name": "product name",
+        "description": "A really cool thing people will buy",
+        "purchased": true,
+        "history": [
+          "20170321T091455",
+          "20200414T102344"
+        ]
+      }
+    }
+  ]
+}

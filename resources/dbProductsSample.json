@@ -1,0 +1,88 @@
+{
+    "Products":
+    [{
+        "PK": "09387789acdf90870b97234908d978",
+        "SK": "v0_product_YYYYMMDDHHMMSS",
+        "product": {
+            "name": "widget",
+            "description": "A really cool thing people will buy",
+            "amount": 1275,
+            "images": {
+                "thumbnail": "http://image.url",
+                "1": "https://image1.url"
+            }
+        },
+        "GSA1": 5,
+        "GSA2": "book",
+        "GSA4": "product"
+    },
+    {
+        "PK": "09387789acdf90870b97234908d978",
+        "SK": "v1_product_YYYYMMDDHHMMSS",
+        "product": {
+            "amount": 1599
+        }
+    },
+    {
+        "PK": "908ab0132s0987c947e0967d09a234ea0649",
+        "SK": "v0_licence_YYYYMMDDHHMMSS",
+        "product": {
+            "name": "widget",
+            "description": "A really cool thing people will buy",    
+            "price_options": {
+                "monthly": 9.95,
+                "anual": 99.95
+            }
+        },
+        "GSA1": 4,
+        "GSA2": "software",
+        "GSA4": "licence"
+    },
+    {
+        "PK": "908ab0132s0987c947e0967d09a234ea0649",
+        "SK": "v0_subscription_YYYYMMDDHHMMSS",
+        "product": {
+            "name": "widget",
+            "description": "A personal grooming item that needs regular refreshment",    
+            "price_options": {
+                "monthly": 9.95,
+                "anual": 99.95
+            }
+        },
+        "stripe": "pi_7d987e987fe987aef124",
+        "GSA1": 4,
+        "GSA2": "personal",
+        "GSA4": "subscription"
+    },
+    {"ACTUAL": "DATA"},
+    {
+        "name": "Mars Aquatic Centre Towel Service",
+        "description": "You didn't come to Mars to worry about laundry, subscribe to our Towel service and get fresh clean towels every day! Poolside towels are also included with your Towel Service.",
+        "amount": 500,
+        "interval_options": {
+            "monthly": {
+                "interval": "month",
+                "interval_count": 1,
+                "amount": 995
+            },
+            "anually": {
+                "interval": "year",
+                "interval_count": 1,
+                "amount": 9995
+            }
+        },
+        "itemType": "service",
+        "category": "hospitality"
+    },
+    {
+        "name": "widget",
+        "description": "A really cool thing people will buy",
+        "amount": 1275,
+        "images": {
+            "thumbnail": "http://image.url",
+            "1": "https://image1.url"
+        },
+        "itemtype": "book",
+        "category": "product"
+    }  
+]}
