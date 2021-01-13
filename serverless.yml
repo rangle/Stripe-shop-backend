@@ -19,7 +19,7 @@ org: keneasson
 custom:
   customDomain:
     domainName: api${opt:stage, self:provider.stage}.kene.info
-    basePath: 'v1'
+    basePath: '/'
     stage: ${opt:stage, self:provider.stage}
     createRoute53Record: true
   serverless-offline:
@@ -42,8 +42,7 @@ custom:
 #    timeout: 20
 #    prewarm: true
   tableNames:
-    businesses: ${self:service}-${opt:stage, self:provider.stage}-businesses01
-    products: ${self:service}-${opt:stage, self:provider.stage}-catalog01
+    products: ${self:service}-${opt:stage, self:provider.stage}-products
     shopping: ${self:service}-${opt:stage, self:provider.stage}-shopping
   dynamodb:
     start:
@@ -54,7 +53,6 @@ custom:
     stages:
       - dev
   ShoppingTableName: ${self:custom.tableNames.shopping}
-  BusinessesTableName: ${self:custom.tableNames.businesses}
   ProductsTableName: ${self:custom.tableNames.products}
   TableWriteCap: 2
   TableReadCap: 2
@@ -83,12 +81,11 @@ provider:
   region: us-east-1
   environment:
     DYNAMODB_TABLE_SHOPPING: ${self:custom.tableNames.shopping}
-    DYNAMODB_TABLE_BUSINESSES: ${self:custom.tableNames.businesses}
     DYNAMODB_TABLE_PRODUCTS: ${self:custom.tableNames.products}
 
     CONFIG_DYNAMODB_ENDPOINT: ${self:custom.endpoints.dynamodb-url}
     STRIPE_API_KEY: 'sk_test_51FlyvzI87EouhiSs3gwb4ruMeEMfs3ithNKkdW3TBPooGA3wwgOAZBSLVgIP85J18duKOPkybiRQpyZk6ch2OY9o00YYJqmyda'
-    STRIPE_API_VERSION: '2020-03-02'
+    STRIPE_API_VERSION: '2020-08-27'
 #    COGNITO_USER_POOL:
 #      'Fn::GetAtt': [ userPool, Arn ]
 # you can add statements to the Lambda function's IAM Role here
@@ -113,10 +110,10 @@ provider:
           - '/'
           - - Fn::GetAtt: [ ShoppingTable, Arn ]
             - "index/*"
-        - Fn::GetAtt: [BusinessesTable, Arn]
+        - Fn::GetAtt: [BusinessTable, Arn]
         - Fn::Join:
             - '/'
-            - - Fn::GetAtt: [ BusinessesTable, Arn ]
+            - - Fn::GetAtt: [ BusinessTable, Arn ]
               - "index/*"
 functions:
   # Payment Intents
@@ -161,7 +158,33 @@ functions:
     handler: src/handler.getProducts
     events:
       - http:
+          path: catalog/getProducts/{type}
+          method: get
+          cors: true
+      - http:
           path: catalog/getProducts
+          method: get
+          cors: true
+  getStripeProducts:
+    handler: src/handler.getStripeProducts
+    events:
+      - http:
+          path: catalog/getStripeProducts
+          method: get
+          cors: true
+  getSubscriptions:
+    handler: src/handler.getSubscriptions
+    events:
+      - http:
+          path: catalog/getSubscriptions/{type}
+          method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                type: true
+      - http:
+          path: catalog/getSubscriptions
           method: get
           cors: true
   addProduct:
@@ -346,7 +369,6 @@ functions:
 resources:
   - ${file(resources/dynamodb-table-products.yml)}
   - ${file(resources/dynamodb-table-shopping.yml)}
-  - ${file(resources/dynamodb-table-business.yml)}
           #  Resources:
           #      userPool:
           #        Type: AWS::Cognito::UserPool

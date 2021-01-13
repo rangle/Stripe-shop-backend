@@ -1,8 +1,8 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
 import { dynamoDb } from "../../utils/db";
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 
-export const getOrders: Handler = (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+export const getOrders: Handler = (event: APIGatewayEvent | ScheduledEvent) => {
 
     const data =  JSON.parse((event as APIGatewayEvent).body);
     const params = {
@@ -13,8 +13,8 @@ export const getOrders: Handler = (event: APIGatewayEvent | ScheduledEvent, cont
     dynamoDb.scan(params, (error, result) => {
         if (error) {
             console.error(error);
-            return errorHandler(callBack, 'ERROR: Couldn\'t fetch the customer', error );
+            return errorHandler('ERROR: Couldn\'t fetch the customer', error );
         }
-        return successHandler(callBack, result);
+        return successHandler(result);
     });
 }

@@ -1,152 +1,119 @@
-import {
-  batchDelete,
-  query,
-  updateBatchData,
-  updateItem,
-  upsert,
-} from '../../utils/db';
-import { getCustomerCart, getCustomerItems, getProductItems } from './getCustomerCartUtils';
-import { CartItems, Order, OrderItems, OrdersTable, OrderStatus, Product } from 'src/types';
-
 import uuid = require('uuid');
+import { itemsByCustomerIDStatus } from './customerCarts/getItemsForCustomer';
+import { OrderFulfillmentStatuses } from '../../utils/constants/shopping_entity_constants';
+import { Address, OrderFulfillmentStatusTypes } from '../../types';
+import { updateCustomerOrderStatus } from './customerCarts/setItemForCustomer';
+import { query } from '../../utils/db';
+
 const timestamp = new Date().getTime();
 
-export const getCustomerOrders = async (customerId: string): Promise<CartItems> => {
-  console.log('customerId', customerId);
-
-  const params = {
-    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-    FilterExpression: 'customerId = :id',
-    ExpressionAttributeValues: { ':id': customerId },
-  };
-  const customerItems = await query(params);
-  console.log('customerItems', customerItems);
-
-  return customerItems;
+export const getCustomerOrdersInCart = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.inCart });
+  return await query(params);
 };
 
-export const saveCustomerOrder = async (
-  customerId: string,
-  orderItems: OrderItems,
-  orderTotal: number,
-  shippingAmount: number
-): Promise<Order> => {
-  try {
-    const orderId = uuid.v1();
-    const params: OrdersTable = {
-      TableName: process.env.DYNAMODB_TABLE_ORDERS,
-      Item: {
-        orderId: orderId,
-        customerId: customerId,
-        products: orderItems,
-        orderTotal,
-        shippingAmount,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-        orderStatus: 'pending',
-      },
-    };
-    console.log('saveCustomerOrder', params);
-    await upsert(params);
-    return params.Item;
-  } catch (error) {
-    console.log('unable to save order', error);
-  }
+export const getCustomerOrdersOrdered = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.ordered });
+  return await query(params);
 };
 
-const updateCartAsOrdered = async (orderItems: OrderItems, OrderId: String): Promise<any[]> => {
-  console.log('updateCartAsOrdered.OrderId', OrderId);
-  const params = {
-    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-    Key: { cartItemId: undefined },
-    UpdateExpression: 'set OrderPendingId = :OrderId',
-    ExpressionAttributeValues: {
-      ':OrderId': OrderId,
-    },
-  };
-  return await updateBatchData(orderItems, params, 'cartItemId');
+export const getCustomerOrdersPaid = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.paid });
+  return await query(params);
 };
 
-export const customerCartToOrder = async ({
+export const getCustomerOrdersAllocated = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.allocated });
+  return await query(params);
+};
+
+export const getCustomerOrdersShipped = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.shipped });
+  return await query(params);
+};
+
+export const getCustomerOrdersDelivered = async (customerId: string) => {
+  const params = itemsByCustomerIDStatus({ customerId, status: OrderFulfillmentStatuses.delivered });
+  return await query(params);
+};
+
+export const updateCustomerOrderToOrdered = ({
   customerId,
-  shippingAmount,
+  itemId,
 }: {
   customerId: string;
-  shippingAmount: number;
-}): Promise<Order> => {
-  try {
-    const cartItems = await getCustomerCart(customerId);
-    if (cartItems.length === 0) {
-      console.log('cart empty');
-      throw new Error('The cart contains no items');
-    }
-    console.log('cart items: ', cartItems);
+  itemId: string;
+}) => {
+  const params = {
+    customerId,
+    itemId,
+    status: OrderFulfillmentStatuses.ordered,
+    };
+  updateCustomerOrderStatus(params);
+};
 
-    const products: Product[] = await getProductItems(cartItems);
-    const orderTotal: number = products.reduce((acc, prod) => (acc += prod.amount), 0);
-    const orderItems: OrderItems = cartItems.reduce((orderItems: OrderItems, item): OrderItems => {
-      const orderItem = {
-        productId: item.productId,
-        cartItemId: item.cartItemId,
-        quantity: item.quantity,
-        // subtotal: item.quantity * products
-      };
-      return [...orderItems, orderItem];
-    }, []);
-    console.log('products from getItemProducts', { products, orderItems });
-    const order: Order = await saveCustomerOrder(
+export const updateCustomerOrderAddPayment = ({
+  customerId,
+  itemId,
+  payment,
+}: {
+  customerId: string;
+  itemId: string;
+  payment: any;
+}) => {
+  const params = {
+    customerId,
+    itemId,
+    status: OrderFulfillmentStatuses.ordered,
+    payment,
+  };
+  updateCustomerOrderStatus(params);
+};
+
+export const updateCustomerOrderToAllocated = ({
+  customerId,
+  itemId,
+}: {
+  customerId: string;
+  itemId: string;
+}) => {
+  const params = {
       customerId,
-      orderItems,
-      orderTotal,
-      shippingAmount
-    );
-    console.log('new Order: ', order);
-    const result = await updateCartAsOrdered(orderItems, order.orderId);
-    console.log('result', { result, order });
-    return order;
-  } catch (error) {
-    console.log('unable to save order', error);
-    throw new Error(error);
-  }
+    itemId,
+    status: OrderFulfillmentStatuses.allocated,
+};
+  updateCustomerOrderStatus(params);
 };
 
-export const confirmCustomerOrder = async (orderId: string, customerId: string) => {
-  try {
-    await updateOrderStatus(orderId, 'ordered');
-    await deleteOrderedItemsFromCart(customerId, orderId);
-
-    return true;
-  } catch (error) {
-    console.log('update Order Status failed: ', error);
-    return false;
-  }
-};
-
-const updateOrderStatus = async (orderId, status: OrderStatus) => {
+export const updateCustomerOrderToShipped = ({
+  customerId,
+  itemId,
+}: {
+  customerId: string;
+  itemId: string;
+  address?: Address;
+}) => {
   const params = {
-    TableName: process.env.DYNAMODB_TABLE_ORDERS,
-    Key: { orderId: orderId },
-    UpdateExpression: 'set orderStatus = :status',
-    ExpressionAttributeValues: {
-      ':status': status,
-    },
-    ReturnValues: 'UPDATED_NEW',
+    customerId,
+    itemId,
+    status: OrderFulfillmentStatuses.shipped,
   };
-  await updateItem(params);
+
+  updateCustomerOrderStatus(params);
 };
 
-const deleteOrderedItemsFromCart = async (customerId: string, orderId: string) => {
-  const cartItems = await getCustomerItems(customerId);
-  console.log('cartItems, orderId', { cartItems, orderId });
-  const itemsToDelete: any[] = cartItems
-    .filter((cartItem) => cartItem.OrderPendingId === orderId)
-    .reduce((acc: string[], cartItem) => {
-      return [...acc, cartItem.cartItemId];
-    }, []);
+export const updateCustomerOrderToDelivered = async ({
+  customerId,
+  itemId,
+}: {
+  customerId: string;
+  itemId: string;
+}) => {
   const params = {
-    TableName: process.env.DYNAMODB_TABLE_CARTITEMS,
-    Key: { cartItemId: undefined },
+    customerId,
+    itemId,
+    status: OrderFulfillmentStatuses.delivered,
   };
-  console.log('itemsToDelete', itemsToDelete);
-  await batchDelete(params, itemsToDelete, 'cartItemId');
+
+  return await updateCustomerOrderStatus(params);
 };

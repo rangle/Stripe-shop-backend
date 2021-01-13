@@ -1,20 +1,20 @@
-export const successHandler = (callback, results) => {
+export const successHandler = (results) => {
     console.log('successHandler', {results});
-    return responseHandler(callback, results, 200);
+    return responseHandler(results, 200);
 };
 
-export const errorHandler = (callback, msg, error) => {
+export const errorHandler = (msg, error) => {
     console.log('errorHandler', {msg, error});
     const response = {
         message: msg,
         errorDetails: error,
     };
 
-    return responseHandler(callback, response, 500);
+    return responseHandler(response, 500);
 };
 
-const responseHandler = (callback, response, statusCode) => {
-    callback(null,{
+const responseHandler = (response, statusCode) => {
+    return {
         statusCode: statusCode,
         headers: {
             'Content-Type': 'application/json',
@@ -26,6 +26,5 @@ const responseHandler = (callback, response, statusCode) => {
             null,
             2,
         ),
-    });
-    return;
+    };
 };

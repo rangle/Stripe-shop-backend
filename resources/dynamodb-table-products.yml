@@ -4,11 +4,68 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       AttributeDefinitions:
-        - AttributeName: productId
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: GSA1
+          AttributeType: N
+        - AttributeName: GSA2
+          AttributeType: S
+        - AttributeName: GSA4
           AttributeType: S
       KeySchema:
-        - AttributeName: productId
+        - AttributeName: PK
           KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
+          KeySchema:
+            - AttributeName: GSA1
+              KeyType: HASH
+            - AttributeName: SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: GSI2
+          KeySchema:
+            - AttributeName: GSA2
+              KeyType: HASH
+            - AttributeName: SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: GSI3
+          KeySchema:
+            - AttributeName: PK
+              KeyType: HASH
+            - AttributeName: GSA1
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: GSI4
+          KeySchema:
+            - AttributeName: GSA4
+              KeyType: HASH
+            - AttributeName: SK
+              KeyType: RANGE
+          Projection:
+            NonKeyAttributes:
+              - product
+            ProjectionType: INCLUDE
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
       ProvisionedThroughput:
         ReadCapacityUnits: ${self:custom.TableReadCap}
         WriteCapacityUnits: ${self:custom.TableWriteCap}

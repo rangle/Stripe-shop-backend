@@ -1,0 +1,9 @@
+{
+	"name": "Mars Aquatic Centre Towel Service",
+	"description": "You didn't come to Mars to worry about laundry, subscribe to our Towel service and get fresh clean towels every day! Poolside towels are also included with your Towel Service.",
+	"amount": 995,
+	"hasSubscription": true,
+	"interval": "day"
+}
+
+

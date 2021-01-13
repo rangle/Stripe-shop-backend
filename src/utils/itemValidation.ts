@@ -1,6 +1,6 @@
-import { CatalogTypes, ProductInput } from '../types';
+import { ItemTypes } from 'src/types';
 
-export const validateItem = (itemType: CatalogTypes, payload: any) => {
+export const validateItem = (itemType: ItemTypes, payload: any) => {
   const errors = [];
 
   if (checkSubscriptionMismatch(payload)) {
@@ -41,5 +41,5 @@ const getBaseProduct = () => ['name', 'description', 'amount', 'currency', 'cate
 
 const getBaseSubscription = () => [
   ...getBaseProduct(),
-  ...['interval_options'],
+  ...['interval'],
 ];

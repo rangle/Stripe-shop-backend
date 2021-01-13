@@ -8,13 +8,13 @@ import {
   OrderFulfillmentStatuses,
 } from '../constants/shopping_entity_constants';
 
-const before_constraint = (status: OrderFulfillmentStatusTypes, sortable: string) => {
+const before_constraint = (status: OrderFulfillmentStatusTypes, sortable: string): DBConstraintType => {
   const kce = ` AND ${columnMapShopping.orderFulfillmentStatus} <= :sc1`;
   const eav = { ':sc1': OrderFulfillmentStatuses[status] + '_' + sortable };
   return { kce, eav };
 };
 
-const after_constraint = (status: OrderFulfillmentStatusTypes, sortable: string) => {
+const after_constraint = (status: OrderFulfillmentStatusTypes, sortable: string): DBConstraintType => {
   const kce = ` AND ${columnMapShopping.orderFulfillmentStatus} >= :sc1`;
   const eav = { ':sc1': OrderFulfillmentStatuses[status] + '_' + sortable };
   return { kce, eav };
@@ -24,7 +24,7 @@ const between_constraint = (
   status: OrderFulfillmentStatusTypes,
   sortable1: string,
   sortable2: string
-) => {
+): DBConstraintType => {
   const kce = ` AND ${columnMapShopping.orderFulfillmentStatus} BETWEEN :sc1 AND :sc2`;
   const eav = {
     ':sc1': OrderFulfillmentStatuses[status] + '_' + sortable1,

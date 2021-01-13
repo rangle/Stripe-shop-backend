@@ -1,19 +1,22 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayEvent, Handler } from 'aws-lambda';
+import { getItemsFromCatalog } from '../../services/db/catalogUtils/getCatalogItems';
+import { ItemTypes } from '../../types';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
-import getCatalogUtil from 'services/CatalogUtils/getAllCatalogItems';
+import { itemTypes } from '../../utils/constants/shopping_entity_constants';
 
 export const getProducts: Handler = async (
-  event: APIGatewayEvent | ScheduledEvent,
-  context: Context,
-  callBack: Callback
+  event: APIGatewayEvent,
 ) => {
-  const limit: number = 10;
-  const search: string = '';
+  // const limit: number = 10;
+  // const search: string = '';
+  const type: string | undefined = event.pathParameters?.type;
+  const itemType: ItemTypes = type && Object.keys(itemTypes).indexOf(type) ? itemTypes[type] : 'product';
 
   try {
-    const catalog = await getCatalogUtil({ search, limit });
-    return successHandler(callBack, catalog);
+    console.log('itemType', itemType);
+    const catalog = await getItemsFromCatalog(itemType);
+    return successHandler(catalog);
   } catch (error) {
-    return errorHandler(callBack, "ERROR: Couldn't fetch the products.", error);
+    return errorHandler("ERROR: Couldn't fetch the products.", error);
   }
 };

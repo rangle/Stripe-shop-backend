@@ -34,7 +34,7 @@ export const makeSubscription = (params: DocumentClient.PutItemInput, props: any
         Item: {
             ...params.Item,
             stripe: props.stripeId,
-            interval_options: props.interval_options
+            interval: props.interval
         }
     }
     return updated;

@@ -15,28 +15,34 @@ type DbLog = {
 
 type Currency = 'cad' | 'usd';
 type Interval = 'day' | 'week' | 'month' | 'year';
-type UsageType = 'licensed' | 'metered';
-type ProductId = string;
 
-type Product = {
-  productId: ProductId;
-  itemType?: ItemTypes;
+type ProductInput = {
   name: string;
   description: string;
-  amount: number;
+  amount?: number;
+  purchase_price?: number;
+  price_options: any;
+  currency: string;
   hasSubscription?: boolean;
-  currency: Currency;
-  createdAt: number;
-  updatedAt: number;
-  stripe?: {
-    Id: string,
-    ProductId?: string,
-    PriceId?: string;
-  };
+  stripeId?: string,
   interval?: string;
+  interval_count?: number;
+  itemType: ItemTypes;
+  category: string;
+};
+
+type Product = {
+  productId: string;
+  category: string;
+  rating: number;
+  product: any;
+  type: ItemTypes;
 };
 
 type Products = Product[];
+
+type UsageType = 'licensed' | 'metered';
+type ProductId = string;
 
 type StripeProductInput = {
   name: string;
@@ -125,6 +131,7 @@ type CustomerInput = {
   email?: string;
   phone?: string;
   address?: Address;
+  isStripeCustomer: boolean;
   StripeCustomerId?: string;
 };
 
@@ -166,23 +173,28 @@ type validBusiness = {
 type PostCartItem = {
   customer: string;
   item: string;
+  quantity: number;
 };
 
 type OrderStatuses = 'inCart' |  'ordered' | 'paid' | 'shipped' | 'delivered';
-type ItemTypes = 'product' | 'licence' | 'service' | 'subscription';
+type ItemTypes = 'product' | 'licence' | 'service' | 'subscription_product' | 'subscription_licence' | 'subscription_service';
 
 type Item = {
   product: Product;
   quantity: number;
-  createdAt?: number;
-  updatedAt?: number;
   orderStatus: OrderStatuses;
+  itemType: ItemTypes;
 };
 
-type UpsertItem = Item & {
-  SK: string, // `ITEM_${uuid}`
-  PK: string, // CustomerId
-}
+type OrderFulfillmentStatusTypes =
+  | 'inCart'
+  | 'ordered'
+  | 'paid'
+  | 'allocated'
+  | 'shipped'
+  | 'delivered'
+  | 'activated'
+  | 'cancelled';
 
 type Items = Item[];
 
@@ -192,6 +204,13 @@ type Validation = {
   isValid: boolean;
 };
 
+type ConstraintTypes = 'before' | 'after' | 'between' | null;
+
 type OnlyTableName = {
   TableName: DocumentClient.TableName;
-}
+};
+
+type DBConstraintType = {
+  kce: string;
+  eav: { [key: string]: string };
+};

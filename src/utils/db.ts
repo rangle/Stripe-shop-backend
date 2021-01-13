@@ -1,9 +1,7 @@
-import { errorHandler, successHandler } from './apiResponse';
-import 'source-map-support/register';
-import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
-import { DbError, OnlyTableName } from 'src/types';
-
 const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
+
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
+import { OnlyTableName } from 'src/types';
 
 const isOffline = process.env.IS_OFFLINE;
 const dynamoDB_endpoint = process.env.CONFIG_DYNAMODB_ENDPOINT;
@@ -26,7 +24,7 @@ export const upsert = (params: DocumentClient.PutItemInput): Promise<any> => {
         reject({ error });
       } else {
         console.log('DB SUCCESS: upsert resolved with ', result);
-        resolve({ result: params.Item });
+        resolve({ item: params.Item });
       }
     });
   });

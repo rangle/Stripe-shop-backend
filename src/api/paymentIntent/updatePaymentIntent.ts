@@ -1,4 +1,4 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
 import { Stripe } from 'stripe';
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 
@@ -6,10 +6,9 @@ import {errorHandler, successHandler} from "../../utils/apiResponse";
  * Utility that should never be used in a Production environment.
  * Use startPayment to create or update the payment intent based on the Customer's Cart.
  */
-export const updatePaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
-    // @ts-ignore
+export const updatePaymentIntent: Handler = async (event: APIGatewayEvent | ScheduledEvent) => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: '2020-08-27',
         typescript: true,
     });
     const requestData: any = JSON.parse((event as APIGatewayEvent).body);
@@ -28,12 +27,12 @@ export const updatePaymentIntent: Handler = async (event: APIGatewayEvent | Sche
             currency,
             payment_method_types: valid_payment_method_types,
         });
-        return successHandler(callBack, {
+        return successHandler({
                     message: 'Payment Intent Created!',
                     PaymentIntent: paymentIntent,
                 });
     }
     catch(error) {
-        errorHandler(callBack,'Error: createPaymentIntent failed with an exception!', error);
+        errorHandler('Error: createPaymentIntent failed with an exception!', error);
     }
 }

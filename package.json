@@ -1,7 +1,7 @@
 {
   "name": "stripe-shop-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "A serverless back-end for an ecommerce platform powered by Stripe",
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -17,32 +17,36 @@
   "author": "Ken Easson",
   "license": "ISC",
   "dependencies": {
+    "ajv": "^7.0.3",
     "jsonwebtoken": "^8.5.1",
     "jwk-to-pem": "^2.0.4",
     "request": "^2.88.2",
-    "stripe": "^8.73.0",
-    "uuid": "^3.3.3",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "stripe": "^8.130.0",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
-    "@serverless/eslint-config": "^2.1.1",
+    "@serverless/eslint-config": "^2.2.0",
     "@types/aws-lambda": "8.10.36",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/node": "^12.12.50",
+    "@types/node": "^12.19.13",
     "@types/request": "^2.48.5",
-    "@types/stripe": "^7.13.24",
+    "@types/stripe": "^7.13.25",
     "@types/uuid": "^3.4.9",
-    "aws-sdk": "^2.714.0",
-    "eslint": "^7.4.0",
-    "eslint-plugin-import": "^2.22.0",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "aws-sdk": "^2.826.0",
+    "eslint": "^7.17.0",
+    "eslint-plugin-import": "^2.22.1",
     "express": "^4.17.1",
     "git-list-updated": "^1.2.1",
-    "prettier": "^2.0.5",
+    "prettier": "^2.2.1",
+    "serverless": "^2.18.0",
     "serverless-domain-manager": "^3.3.2",
     "serverless-dynamodb-local": "^0.2.39",
-    "serverless-http": "^2.5.0",
+    "serverless-http": "^2.6.0",
     "serverless-offline": "^5.12.1",
     "serverless-plugin-typescript": "^1.1.9",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.7"
   }
 }

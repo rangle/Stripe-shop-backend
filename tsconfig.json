@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "sourceMap": true,
+    "outDir": "dist",
     "moduleResolution": "node",
     "allowJs": true,
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@/*":["src/*"]
+      "@src/*": ["src/*"],
+      "@types": ["src/types"],
+      "@tests/*": ["tests/*"]
     },
     "lib": [
       "es2018",
@@ -16,6 +19,6 @@
     "node_modules"
   ],
   "types": [
-    "./types.d.ts"
+    "src/types.d.ts"
   ]
 }

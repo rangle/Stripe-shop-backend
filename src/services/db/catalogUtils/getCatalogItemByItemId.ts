@@ -1,9 +1,9 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { Item } from '../../../types';
+import { Product } from '../../../types';
 import { columnMapProducts, ITEM_PREFIX } from '../../../utils/constants/products_entity_constants';
 import { query } from '../../../utils/db';
 
-const mapItemResult = (item) => {
+const mapItemResult = (item): Product => {
   return {
     productId: item[columnMapProducts.productId].replace(ITEM_PREFIX, ''),
     rating: item[columnMapProducts.rating],
@@ -13,7 +13,7 @@ const mapItemResult = (item) => {
   }
 }
 
-export const getCatalogItemByItemId = async (itemId: string): Promise<Item> => {
+export const getCatalogItemByItemId = async (itemId: string): Promise<Product> => {
   const params: DocumentClient.QueryInput = {
     TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
     KeyConditionExpression: `${columnMapProducts.productId} = ${itemId} and begins_with(${columnMapProducts.versionCode_Date}, :ver)`,

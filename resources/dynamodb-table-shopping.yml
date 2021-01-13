@@ -8,50 +8,77 @@ Resources:
           AttributeType: S
         - AttributeName: SK
           AttributeType: S
-        - AttributeName: LSA1
-          AttributeType: S
-        - AttributeName: LSA2
-          AttributeType: S
+        # - AttributeName: LSA1
+        #   AttributeType: S
+        # - AttributeName: LSA2
+        #   AttributeType: S
         - AttributeName: GSA1
           AttributeType: S
         - AttributeName: GSA2
+          AttributeType: S
+        - AttributeName: GSA3
+          AttributeType: S
+        - AttributeName: GSA4
           AttributeType: S
       KeySchema:
         - AttributeName: PK
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
-      LocalSecondaryIndexes:
-        - IndexName: LSI1
+      # LocalSecondaryIndexes:
+      #   - IndexName: LSI1
+      #     KeySchema:
+      #       - AttributeName: PK
+      #         KeyType: HASH
+      #       - AttributeName: LSA1
+      #         KeyType: RANGE
+      #   - IndexName: LSI2
+      #     KeySchema:
+      #       - AttributeName: PK
+      #         KeyType: HASH
+      #       - AttributeName: LSA2
+      #         KeyType: HASH
+      #     Projection:
+      #       ProjectionType: KEYS_ONLY
+      #     ProvisionedThroughput:
+      #       ReadCapacityUnits: ${self:custom.TableReadCap}
+      #       WriteCapacityUnits: ${self:custom.TableWriteCap}
+      GlobalSecondaryIndexes:
+        - IndexName: GSI1
           KeySchema:
             - AttributeName: PK
               KeyType: HASH
-            - AttributeName: LSA1
+            - AttributeName: GSA1
               KeyType: RANGE
-        - IndexName: LSI2
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: GSI2
           KeySchema:
-            - AttributeName: PK
-              KeyType: HASH
-            - AttributeName: LSA2
+            - AttributeName: GSA2
               KeyType: HASH
           Projection:
             ProjectionType: KEYS_ONLY
           ProvisionedThroughput:
             ReadCapacityUnits: ${self:custom.TableReadCap}
             WriteCapacityUnits: ${self:custom.TableWriteCap}
-      GlobalSecondaryIndexes:
-        - IndexName: GSI1
+        - IndexName: GSI3
           KeySchema:
-            - AttributeName: GSA1
+            - AttributeName: GSA3
               KeyType: HASH
-            - AttributeName: PK
-              KeyType: RANGE
           Projection:
             ProjectionType: KEYS_ONLY
-        - IndexName: GSI2
+          ProvisionedThroughput:
+            ReadCapacityUnits: ${self:custom.TableReadCap}
+            WriteCapacityUnits: ${self:custom.TableWriteCap}
+        - IndexName: GSI4
           KeySchema:
-            - AttributeName: GSA2
+            - AttributeName: PK
               KeyType: HASH
+            - AttributeName: GSA4
+              KeyType: RANGE
           Projection:
             ProjectionType: KEYS_ONLY
           ProvisionedThroughput:

@@ -8,10 +8,9 @@ import {
   ITEM_PREFIX,
   OrderFulfillmentStatuses,
 } from '../../../utils/constants/shopping_entity_constants';
-import { Item, ItemTypes, OrderFulfillmentStatusTypes } from '../../../types';
-import DynamoDB = require('aws-sdk/clients/dynamodb');
+import { ItemTypes, OrderFulfillmentStatusTypes, Product } from '../../../types';
 
-const validateItemDetail = (type: ItemTypes, itemString: string): Boolean => {
+const validateItemDetail = (type: ItemTypes, itemString: string): boolean => {
   const parts = itemString.split('_', 1);
   return (type == parts[0])
 }
@@ -25,8 +24,8 @@ export const addItemToCustomerCart = async ({
   itemType = 'product',
 }: {
   customerId: string;
-  itemDetail: Item;
-  quantity: Number ;
+  itemDetail: Product;
+  quantity: number ;
   itemType: ItemTypes;
 }) => {
   const newItem: DocumentClient.PutItemInputAttributeMap = {
@@ -54,8 +53,8 @@ export const modifyItemInCustomerCart = async ({
   terms,
 }: {
   customerId: string;
-  itemDetail: Item;
-  quantity: Number;
+  itemDetail: Product;
+  quantity: number;
   terms?: any;
 }) => {
   const updateItemParams: DocumentClient.UpdateItemInput = {
@@ -81,7 +80,7 @@ export const modifyItemInCustomerCart = async ({
 
 
 export const updateCustomerOrderStatus = async ({
-  itemId,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+  itemId,
   customerId,
   status,
   payment,

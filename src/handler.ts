@@ -8,7 +8,8 @@ export * from './api/subscriptions/startSubscription';
 
 export * from './api/catalog/addProduct';
 export * from './api/catalog/getProducts';
-export * from './api/catalog/importProducts';
+export * from './api/catalog/getStripeProducts';
+export * from './api/catalog/getSubscriptions';
 
 export * from './api/cart/addCartItem';
 export * from './api/cart/getCustomerCart';
@@ -24,7 +25,6 @@ export * from './api/terminal/connect';
 export * from './api/customer/addCustomer';
 export * from './api/customer/getCustomer';
 export * from './api/customer/getCustomers';
-export * from './api/customer/importCustomers';
 
 // export * from './api/business/addBusiness';
 // export * from './api/business/getBusiness';
