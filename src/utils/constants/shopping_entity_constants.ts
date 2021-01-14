@@ -1,5 +1,5 @@
 // Primary Key (PK) prefixes
-import { ItemTypes, OrderFulfillmentStatusTypes, SubscriptionTypes } from 'src/types';
+import { ItemTypes, OrderFulfillmentStatusTypes } from 'src/types';
 
 export const CUSTOMER_PREFIX = 'CUST_';
 export const ITEM_PREFIX = 'ITEM_';
@@ -63,8 +63,13 @@ export const itemTypes: {[key:string]: ItemTypes} = {
 
 export const subscriptionPrefix = 'subscription_';
 
-export const subscriptionTypes: {[key:string]: SubscriptionTypes} = {
+export const subscriptionTypes: {[key:string]: ItemTypes} = {
   subscription_product: 'subscription_product',
   subscription_licence: 'subscription_licence',
   subscription_service: 'subscription_service',
 };
+
+export const allTypes: {[key:string]: ItemTypes} = {
+  ...itemTypes,
+  ...subscriptionTypes,
+}

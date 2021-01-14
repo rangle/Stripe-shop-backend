@@ -1,14 +1,15 @@
-import { CatalogTypes, ItemTypes, SubscriptionTypes } from '../../../types';
+import { ItemTypes } from 'src/types';
 import {
   columnMapProducts,
   indexMapProducts,
 } from '../../../utils/constants/products_entity_constants';
 import { itemTypes, subscriptionTypes } from '../../../utils/constants/shopping_entity_constants';
-import { query, scan } from '../../../utils/db';
+import { get, query, scan } from '../../../utils/db';
+import * as stripe from 'stripe';
+import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
 
-export const getCatalogUtil = async ({
-  search = '',
-  limit = 10,
+export const dumpFullCatalogUtil = async ({
+  limit = 100,
 }: {
   search: string;
   limit: number;
@@ -16,30 +17,42 @@ export const getCatalogUtil = async ({
   const params = {
     TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
     Select: 'ALL_ATTRIBUTES',
-    Limit: limit ?? 100,
+    Limit: limit,
   };
 
   return await scan(params);
 };
 
-const fromCatalog = ({ type }: { type: CatalogTypes }) => {
+const fromCatalog = ({ type }: { type: ItemTypes }) => {
   return {
     TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
     IndexName: indexMapProducts.productType,
     KeyConditionExpression: `${columnMapProducts.itemType} = :type AND begins_with(${columnMapProducts.versionCode_Date}, :ver)`,
     ExpressionAttributeValues: {
       ':type': type,
-      ':ver': 'v0_' + type.substr('subscription_'.length),
+      ':ver': 'V0_',
     },
   };
 };
 
-export const getSubscriptionFromCatalog = async (type: SubscriptionTypes) => {
-  const params = fromCatalog({ type: subscriptionTypes[type] });
-  return await query(params);
+const byPrimaryKey = ({ id, version }: { id: string, version: string }): DocumentClient.GetItemInput => {
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
+    Key: {},
+    };
+
+  params.Key[columnMapProducts.productId] =  {"S": id};
+  params.Key[columnMapProducts.versionCode_Date] = {"S": version};
+  return params;
 };
 
 export const getItemsFromCatalog = async (type: ItemTypes) => {
   const params = fromCatalog({ type: type });
   return await query(params);
 };
+
+export const getItemFromCatalog = async (id: string, version: string): Promise<DocumentClient.GetItemOutput> => {
+  const params = byPrimaryKey({id, version});
+  console.log('get params', params);
+  return await get(params);
+}

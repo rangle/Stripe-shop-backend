@@ -1,14 +1,16 @@
 // Primary Key (PK) prefixes
-import { CatalogTypes } from 'src/types';
+import { ItemTypes } from 'src/types';
 
 export const ITEM_PREFIX = 'ITEM_';
 export const REVIEWER_PREFIX = 'CUST_';
 
 
-const itemTypes: {[key:string]: CatalogTypes} = {
+const itemTypes: {[key:string]: ItemTypes} = {
   product: 'product',
   licence: 'licence',
   service: 'service',
+  rental: 'rental',
+  lease: 'lease',
   subscriptionProduct: 'subscription_product',
   subscriptionLicence: 'subscription_licence',
   subscriptionService: 'subscription_service',

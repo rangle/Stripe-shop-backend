@@ -154,6 +154,13 @@ functions:
           method: post
           cors: true
   # Catalog Products
+  getProduct:
+    handler: src/handler.getProductById
+    events:
+      - http:
+          path: catalog/getProductById
+          method: post
+          cors: true
   getProducts:
     handler: src/handler.getProducts
     events:

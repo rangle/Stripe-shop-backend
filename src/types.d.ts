@@ -13,8 +13,18 @@ type DbLog = {
   [key: string]: string;
 }[];
 
+type ItemTypes =
+  'product'
+  | 'licence'
+  | 'service'
+  | 'rental'
+  | 'lease'
+  | 'subscription_product'
+  | 'subscription_licence'
+  | 'subscription_service';
 type Currency = 'cad' | 'usd';
 type Interval = 'day' | 'week' | 'month' | 'year';
+type OrderStatuses = 'inCart' | 'ordered' | 'paid' | 'shipped' | 'delivered';
 
 type ProductInput = {
   name: string;
@@ -159,10 +169,10 @@ type BusinessInput = {
 type Business =
   | BusinessInput
   | {
-      businessId: string;
-      createdAt: number;
-      updatedAt: number;
-    };
+  businessId: string;
+  createdAt: number;
+  updatedAt: number;
+};
 
 type validBusiness = {
   isValid: boolean;
@@ -176,8 +186,6 @@ type PostCartItem = {
   quantity: number;
 };
 
-type OrderStatuses = 'inCart' |  'ordered' | 'paid' | 'shipped' | 'delivered';
-type ItemTypes = 'product' | 'licence' | 'service' | 'subscription_product' | 'subscription_licence' | 'subscription_service';
 
 type Item = {
   product: Product;

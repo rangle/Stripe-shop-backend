@@ -1,7 +1,7 @@
 import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
 import { PostCartItem, Product } from '../../types';
-import { getCatalogItemByItemId } from '../../services/db/catalogUtils/getCatalogItemByItemId';
+import { getCatalogItem } from '../../services/db/catalogUtils/getCatalogItem';
 import { addItemToCustomerCart } from '../../services/db/customerCarts/setItemForCustomer';
 
 export const addCartItem: Handler = async (event: APIGatewayEvent | ScheduledEvent) => {
@@ -10,7 +10,7 @@ export const addCartItem: Handler = async (event: APIGatewayEvent | ScheduledEve
 
    const customerId: string = data.customer;
 
-   const itemDetail: Product = await getCatalogItemByItemId(data.item);
+   const itemDetail: Product = await getCatalogItem(data.item);
 
   const quantity: number = data.quantity || 1;
 

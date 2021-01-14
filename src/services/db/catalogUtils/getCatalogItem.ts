@@ -13,7 +13,7 @@ const mapItemResult = (item): Product => {
   }
 }
 
-export const getCatalogItemByItemId = async (itemId: string): Promise<Product> => {
+export const getCatalogItem = async (itemId: string): Promise<Product> => {
   const params: DocumentClient.QueryInput = {
     TableName: process.env.DYNAMODB_TABLE_PRODUCTS,
     KeyConditionExpression: `${columnMapProducts.productId} = ${itemId} and begins_with(${columnMapProducts.versionCode_Date}, :ver)`,
