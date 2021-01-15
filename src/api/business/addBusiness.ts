@@ -3,11 +3,13 @@ import {Stripe} from 'stripe';
 import {upsert} from "../../utils/db";
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 import {validateBusiness} from "../../utils/BusinessValidations";
+import { Stripe_API_Version } from '../../config';
+import { BusinessInput } from '../../types';
 // import {createBusiness} from "../../services/stripe/createBusiness";
 
 export const addBusiness: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     });
 

@@ -1,7 +1,8 @@
 import uuid = require("uuid");
+import { Business, BusinessInput, DbError, validBusiness } from '../types';
 
 export const validateBusiness = (dataIn: BusinessInput): validBusiness => {
-    const errors: DbError = {};
+    const errors: DbError[] = [];
     const timestamp = new Date().getTime();
 
     const params: Business = {
@@ -31,10 +32,13 @@ export const validateBusiness = (dataIn: BusinessInput): validBusiness => {
         },
     };
     required.map(key => {
-        dataIn[key] && (reqParams[key] = dataIn[key]) || (errors[key] = 'Is a required field');
+        dataIn[key] && (reqParams[key] = dataIn[key]) || (errors.push({
+            error: key + ' Is a required field',
+            message: key + ' Is a required field',
+        }));
     });
 
-    if (Object.keys(errors).length > 0) {
+    if (errors.length > 0) {
         return {isValid: false, errors};
     }
 

@@ -16,12 +16,12 @@ export const productGet = async (limit: number, starting_after: string): Promise
     apiVersion: Stripe_API_Version,
     typescript: true,
   });
-  const params: Stripe.SkuListParams = {
+  const params: Stripe.ProductListParams = {
     limit,
     starting_after,
   }
 
-  const skus = await stripe.products.list(params);
-  return skus.data;
+  const products = await stripe.products.list(params);
+  return products.data;
 };
 

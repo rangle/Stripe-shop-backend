@@ -18,9 +18,9 @@ org: keneasson
 
 custom:
   customDomain:
-    domainName: api${opt:stage, self:provider.stage}.kene.info
-    basePath: '/'
-    stage: ${opt:stage, self:provider.stage}
+    domainName: api${opt:stage}.kene.info
+    basePath: 'v0'
+    stage: ${opt:stage}
     createRoute53Record: true
   serverless-offline:
     port: 15001
@@ -75,7 +75,6 @@ custom:
 provider:
   name: aws
   runtime: nodejs12.x
-
 # you can overwrite defaults here
   stage: dev
   region: us-east-1
@@ -110,11 +109,11 @@ provider:
           - '/'
           - - Fn::GetAtt: [ ShoppingTable, Arn ]
             - "index/*"
-        - Fn::GetAtt: [BusinessTable, Arn]
-        - Fn::Join:
-            - '/'
-            - - Fn::GetAtt: [ BusinessTable, Arn ]
-              - "index/*"
+#        - Fn::GetAtt: [BusinessTable, Arn]
+#        - Fn::Join:
+#            - '/'
+#            - - Fn::GetAtt: [ BusinessTable, Arn ]
+#              - "index/*"
 functions:
   # Payment Intents
 #  createPaymentIntent:
@@ -177,21 +176,6 @@ functions:
     events:
       - http:
           path: catalog/getStripeProducts
-          method: get
-          cors: true
-  getSubscriptions:
-    handler: src/handler.getSubscriptions
-    events:
-      - http:
-          path: catalog/getSubscriptions/{type}
-          method: get
-          cors: true
-          request:
-            parameters:
-              querystrings:
-                type: true
-      - http:
-          path: catalog/getSubscriptions
           method: get
           cors: true
   addProduct:

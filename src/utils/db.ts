@@ -106,7 +106,7 @@ export const query = (params: DocumentClient.QueryInput): Promise<any> => {
         }
         // create a response
         console.log('SUCCESS: DynamoDB.get: ', result);
-        return resolve(result.Items);
+        return resolve(result);
       });
     } catch (error) {
       return reject({ message: 'ERROR: DynamoDB.get', error });

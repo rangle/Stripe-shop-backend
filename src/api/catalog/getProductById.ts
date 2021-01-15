@@ -1,7 +1,6 @@
 import { APIGatewayEvent, Handler } from 'aws-lambda';
 import { getItemFromCatalog, getItemsFromCatalog } from '../../services/db/catalogUtils/getCatalogItems';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
-import { ProductInput } from '@types';
 
 export const getProductById: Handler = async (
   event: APIGatewayEvent,

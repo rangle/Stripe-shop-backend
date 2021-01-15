@@ -1,10 +1,11 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
+import { Stripe_API_Version } from '../../config';
 import { Stripe } from 'stripe';
 import {errorHandler, successHandler} from "../../utils/apiResponse";
 
-export const createTerminalConnection: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+export const createTerminalConnection: Handler = async (event: APIGatewayEvent | ScheduledEvent) => {
     const config: Stripe.StripeConfig = {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     };
     const stripe = new Stripe(process.env.STRIPE_API_KEY, config);
@@ -13,13 +14,13 @@ export const createTerminalConnection: Handler = async (event: APIGatewayEvent |
     try {
         const terminalToken = await stripe.terminal.connectionTokens.create();
         console.log('terminalToken', terminalToken);
-        return successHandler(callBack, {
+        return successHandler({
             success: true,
             message: 'Terminal Connection Created!',
             terminalToken: terminalToken,
         });
     } catch (err) {
-        return errorHandler(callBack, 'Terminal Connection FAILED!', err);
+        return errorHandler('Terminal Connection FAILED!', err);
     }
 }
 

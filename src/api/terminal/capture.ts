@@ -1,14 +1,15 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
+import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
+import { Stripe_API_Version } from '../../config';
+import { updateCustomerOrderAddPayment } from '../../services/db/customerOrderUtils';
 import { Stripe } from 'stripe';
 import { errorHandler, successHandler } from '../../utils/apiResponse';
 
 export const capturePaymentIntent: Handler = async (
   event: APIGatewayEvent | ScheduledEvent,
-  context: Context,
-  callBack: Callback
+
 ) => {
   const config: Stripe.StripeConfig = {
-    apiVersion: process.env.STRIPE_API_VERSION,
+    apiVersion: Stripe_API_Version,
     typescript: true,
   };
   const stripe = new Stripe(process.env.STRIPE_API_KEY, config);
@@ -20,14 +21,18 @@ export const capturePaymentIntent: Handler = async (
     const paymentIntent = await stripe.paymentIntents.capture(data.pi_id);
     console.log('paymentIntent capture', paymentIntent);
     if (data.orderId && data.customerId) {
-      deleteOrder;
+      updateCustomerOrderAddPayment({
+        customerId: data.customerId,
+        itemId: data.itemId,
+        payment: paymentIntent.amount,
+      });
     }
-    return successHandler(callBack, {
+    return successHandler({
       success: true,
       message: 'SUCCESS payment intent captured!',
       paymentIntent: paymentIntent,
     });
   } catch (err) {
-    return errorHandler(callBack, 'FAILURE payment intent not captured!', err);
+    return errorHandler('FAILURE payment intent not captured!', err);
   }
 };

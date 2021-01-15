@@ -2,7 +2,7 @@ import {Stripe} from 'stripe';
 
 export const priceCreate = async ({productId, unit_amount, currency, interval}): Promise<Stripe.Price> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     });
 
@@ -25,5 +25,5 @@ export const priceCreate = async ({productId, unit_amount, currency, interval}):
     catch (error) {
         console.log('Unable to save price to Stripe Platform', {params, error});
         throw(error);
-    };
+    }
 };

@@ -3,9 +3,7 @@ import {
   columnMapProducts,
   indexMapProducts,
 } from '../../../utils/constants/products_entity_constants';
-import { itemTypes, subscriptionTypes } from '../../../utils/constants/shopping_entity_constants';
 import { get, query, scan } from '../../../utils/db';
-import * as stripe from 'stripe';
 import { DocumentClient } from 'aws-sdk/lib/dynamodb/document_client';
 
 export const dumpFullCatalogUtil = async ({

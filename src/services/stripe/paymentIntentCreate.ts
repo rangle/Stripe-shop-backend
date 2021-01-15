@@ -1,8 +1,10 @@
 import {Stripe} from 'stripe';
+import { Stripe_API_Version } from '../../config';
+import { PaymentIntent } from '../../types';
 
 export const paymentIntentCreate = async (paymentIntent: PaymentIntent): Promise<Stripe.PaymentIntent> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     });
 
@@ -13,5 +15,5 @@ export const paymentIntentCreate = async (paymentIntent: PaymentIntent): Promise
     catch (error) {
         console.log('Unable to save customer to Stripe Platform');
         throw(error);
-    };
+    }
 };

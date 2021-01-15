@@ -1,6 +1,7 @@
+import { DbError, PaymentInput, PaymentIntent } from '../types';
 
 export const validatePaymentIntent = (dataIn: PaymentInput) => {
-    const errors: DbError = {};
+    const errors: DbError[] = [];
     if (dataIn.amount <= 0) {
         errors['amount'] = 'Amount must be a positive number';
     }

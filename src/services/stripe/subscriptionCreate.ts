@@ -1,8 +1,10 @@
+import { Stripe_API_Version } from '../../config';
+import { StripeSubscriptionItems, StripeSubscription } from '../../types';
 import { Stripe } from 'stripe';
 
 export const subscriptionCreate = async (customerId: string, items: StripeSubscriptionItems[]): Promise<Stripe.Subscription> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     });
 
@@ -21,5 +23,5 @@ export const subscriptionCreate = async (customerId: string, items: StripeSubscr
     catch (error) {
         console.log('Unable to save product to Stripe Platform', params);
         throw(error);
-    };
+    }
 }

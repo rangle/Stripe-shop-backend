@@ -1,9 +1,10 @@
 import { Stripe } from 'stripe';
 import { CustomerInput } from 'src/types';
+import { Stripe_API_Version } from '@src/config';
 
 export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Customer> => {
     const stripe = new Stripe(process.env.STRIPE_API_KEY, {
-        apiVersion: process.env.STRIPE_API_VERSION,
+        apiVersion: Stripe_API_Version,
         typescript: true,
     });
 
@@ -34,5 +35,5 @@ export const customerUpdate = async (customer: CustomerInput): Promise<Stripe.Cu
     catch (error) {
         console.log('Unable to save customer to Stripe Platform');
         throw(error);
-    };
+    }
 };

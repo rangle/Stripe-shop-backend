@@ -1,60 +1,56 @@
-import { APIGatewayEvent, ScheduledEvent, Callback, Context, Handler } from 'aws-lambda';
-import {errorHandler, successHandler} from "../../utils/apiResponse";
-import {
-    getCustomerItems,
-    getSubscriptionItems,
-} from "../../services/db/getCustomerCartUtils";
-import {customerRead} from "../../services/db/customerRead";
-import {customerCreate} from "../../services/stripe/customerCreate";
-import {customerWrite} from "../../services/db/customerWrite";
-import {subscriptionCreate} from "../../services/stripe/subscriptionCreate";
-import { CartItems, StripeSubscriptionItems } from 'src/types';
+import { APIGatewayEvent, ScheduledEvent, Handler } from 'aws-lambda';
+import { errorHandler, successHandler } from '../../utils/apiResponse';
 
-export const startSubscription: Handler = async (event: APIGatewayEvent | ScheduledEvent, context: Context, callBack: Callback) => {
+import { customerCreate } from '../../services/stripe/customerCreate';
+import { subscriptionCreate } from '../../services/stripe/subscriptionCreate';
+import { StripeSubscriptionItems } from '../../types';
+import { getCustomerOrdersPaid } from '../../services/db/customerOrderUtils';
+import { columnMapShopping, itemTypes } from '../../utils/constants/shopping_entity_constants';
+import { getCustomerById } from '../../services/db/customers/getCustomer';
+import { setCustomer } from '../../services/db/customers/setCustomer';
+
+export const startSubscription: Handler = async (
+  event: APIGatewayEvent | ScheduledEvent,
+
+) => {
     /**
      * @todo pass in an optional "Product ID" if users want to setup a Specific Product
      * This could be done here, as Subscriptions are typically managed 1 at a time.
      */
-    const {
-        customerId,
-    }: any = JSON.parse((event as APIGatewayEvent).body);
+  const { customerId }: any = JSON.parse((event as APIGatewayEvent).body);
 
     try {
         // Check if Customer exists
-        const customer = await customerRead(customerId);
+    const customer = await getCustomerById(customerId);
         if (! customer) {
             return errorHandler(
-                callBack,
                 'ERROR startSubscription FAILED!',
-                'The customer was not found',
+        'The customer was not found'
             );
-        };
+    }
 
         // Check if Customer has any Subscriptions
-        const items: CartItems = await getCustomerItems(customerId);
+    const items: any = await getCustomerOrdersPaid(customerId);
         if (! items.length) {
-            return errorHandler(
-                callBack,
-                'ERROR startSubscription FAILED!',
-                'Your Cart is empty',
-            );
-        };
+      return errorHandler('ERROR startSubscription FAILED!', 'Your Cart is empty');
+    }
         // filter items for Subscriptions.
-        const products = await getSubscriptionItems(items);
-        if (! products.length) {
+    const subscriptions = items.filter(
+      (item) => item[columnMapShopping.itemType] == itemTypes.subscription
+    );
+    if (!subscriptions.length) {
             return errorHandler(
-                callBack,
                 'ERROR startSubscription FAILED!',
-                'Your Cart has no Subscriptions',
+        'Your Cart has no Subscriptions'
             );
-        };
+    }
 
         const keyedItems = items.reduce((acc: any, item) => {
-            acc[item.productId] = item
+      acc[item.productId] = item;
             return acc;
         }, {});
 
-        const customerSubs: StripeSubscriptionItems[] = products.map((item) => ({
+    const customerSubs: StripeSubscriptionItems[] = subscriptions.map((item) => ({
             price: item.stripePriceId,
             quantity: keyedItems[item.productId].quantity,
         }));
@@ -66,24 +62,18 @@ export const startSubscription: Handler = async (event: APIGatewayEvent | Schedu
             customer.StripeCustomerId = stripeCustomer.id;
             console.log('Added stripeCustomer', stripeCustomer);
             // update customer in local db
-            const savedCustomer = await customerWrite(customer);
+      const savedCustomer = await setCustomer(customer);
         }
 
         const subscription = await subscriptionCreate(customer.StripeCustomerId, customerSubs);
         console.log('subscription', subscription);
-        return successHandler(
-            callBack,
-            {
+    return successHandler({
                 message: 'subscription Created!',
                 subscription,
             });
     }
     catch(error) {
         console.log('oops something went wrong', error);
-        return errorHandler(
-            callBack,
-            'ERROR startPayment FAILED!',
-            error
-        );
+    return errorHandler('ERROR startPayment FAILED!', error);
     }
-}
+};
